@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>健康指标 - Artemis</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- 引入Vue和Female UI样式 -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <link rel="stylesheet" href="female-ui-styles.css">
+    <!-- 引入图标库 -->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <style>
+        /* 基础样式 */
+        body {
+            background-color: #FFF5F7;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 导航栏样式修改 */
+        nav {
+            background-color: #E57C9F;
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(229, 124, 159, 0.2);
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: clamp(20px, 4vw, 40px);
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-size: clamp(14px, 2vw, 18px);
+            padding: 8px 16px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        nav a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* 标题样式 */
+        .header {
+            text-align: center;
+            padding: 40px 20px 50px;
+            position: relative;
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background-color: #E57C9F;
+            border-radius: 3px;
+        }
+
+        h1 {
+            color: #4A2C40;
+            font-size: clamp(36px, 5vw, 48px);
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+            font-weight: 700;
+        }
+
+        h2 {
+            color: #4A2C40;
+            font-size: clamp(18px, 2.5vw, 24px);
+            font-weight: normal;
+            margin: 0;
+            opacity: 0.8;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            background: linear-gradient(to right, #4A2C40, #E57C9F);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: inline-block;
+            padding-bottom: 5px;
+        }
+
+        /* 优化标题动画效果 */
+        .animated-title {
+            display: inline-block;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s ease;
+        }
+        
+        .animated-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: #E57C9F;
+            transform: scaleX(0);
+            transform-origin: bottom right;
+            transition: transform 0.5s ease;
+        }
+        
+        .animated-title:hover {
+            transform: translateY(-5px);
+            text-shadow: 0 5px 15px rgba(229, 124, 159, 0.3);
+        }
+        
+        .animated-title:hover::after {
+            transform: scaleX(1);
+            transform-origin: bottom left;
+        }
+        
+        .animated-title i {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        /* 健康摘要区域 */
+        .health-summary {
+            background-color: white;
+            border-radius: 20px;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto 50px;
+            box-shadow: 0 4px 20px rgba(156, 91, 128, 0.12);
+        }
+
+        .summary-title {
+            color: #4A2C40;
+            font-size: clamp(18px, 2.5vw, 22px);
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .summary-stats {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            gap: 15px;
+        }
+
+        .stat-item {
+            text-align: center;
+            flex: 1;
+            min-width: 120px;
+            padding: 15px 10px;
+            border-radius: 15px;
+            background-color: rgba(229, 124, 159, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .stat-item:hover {
+            background-color: rgba(229, 124, 159, 0.1);
+            transform: translateY(-3px);
+        }
+
+        .stat-value {
+            font-size: clamp(24px, 3vw, 32px);
+            font-weight: bold;
+            color: #E57C9F;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: clamp(12px, 1.5vw, 14px);
+            color: #4A2C40;
+        }
+
+        /* 健康数据概览图表 */
+        .health-overview {
+            background-color: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 1200px;
+            margin: 60px auto;
+            box-shadow: 0 4px 20px rgba(156, 91, 128, 0.12);
+            transition: all 0.3s ease;
+        }
+        
+        .health-overview:hover {
+            box-shadow: 0 8px 30px rgba(156, 91, 128, 0.15);
+            transform: translateY(-5px);
+        }
+        
+        .overview-title {
+            color: #4A2C40;
+            font-size: clamp(18px, 2.5vw, 22px);
+            margin-bottom: 20px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .overview-title i {
+            color: #E57C9F;
+            font-size: 1.2em;
+        }
+        
+        .image-container {
+            position: relative;
+            width: 100%;
+            height: 300px;
+            border-radius: 20px;
+            overflow: hidden;
+            margin: 30px 0;
+            box-shadow: 0 8px 25px rgba(229, 124, 159, 0.25);
+        }
+        
+        .image-container img {
+            display: block !important;
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover !important;
+            transition: transform 0.6s ease;
+        }
+        
+        .image-container:hover img {
+            transform: scale(1.05);
+        }
+        
+        .image-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(229, 124, 159, 0.9), rgba(229, 124, 159, 0) 120px);
+            padding: 30px 20px 20px;
+            color: white;
+        }
+        
+        .image-overlay h4 {
+            margin: 0 0 10px 0;
+            font-size: clamp(18px, 2.5vw, 24px);
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        .image-overlay p {
+            margin: 0;
+            font-size: clamp(14px, 1.8vw, 16px);
+            opacity: 0.95;
+            max-width: 600px;
+        }
+
+        /* 心情选择组件样式 */
+        .mood-container {
+            margin-top: 60px;
+            padding: 25px;
+            background-color: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .mood-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .mood-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 10px;
+            border-radius: 12px;
+            position: relative;
+        }
+
+        .mood-item:hover {
+            background-color: rgba(253, 234, 241, 0.6);
+            transform: translateY(-3px);
+        }
+
+        .mood-item.selected {
+            background-color: rgba(253, 234, 241, 0.8);
+            box-shadow: 0 4px 8px rgba(255, 143, 177, 0.2);
+        }
+
+        .mood-item.selected::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: var(--female-primary);
+        }
+
+        .mood-icon {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-bottom: 8px;
+            transition: all 0.3s ease;
+            font-size: 24px;
+        }
+
+        .mood-icon i {
+            transition: all 0.3s ease;
+        }
+
+        .mood-item:hover .mood-icon i {
+            transform: scale(1.2);
+        }
+
+        .mood-label {
+            font-size: 14px;
+            color: #333;
+            text-align: center;
+        }
+
+        .mood-submit {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        /* 心情颜色定义 */
+        .mood-happy {
+            background-color: rgba(255, 230, 0, 0.2);
+            color: #ffcc00;
+        }
+
+        .mood-sad {
+            background-color: rgba(100, 149, 237, 0.2);
+            color: #6495ed;
+        }
+
+        .mood-excited {
+            background-color: rgba(255, 99, 71, 0.2);
+            color: #ff6347;
+        }
+
+        .mood-calm {
+            background-color: rgba(173, 216, 230, 0.2);
+            color: #add8e6;
+        }
+
+        .mood-frustrated {
+            background-color: rgba(139, 0, 0, 0.2);
+            color: #8b0000;
+        }
+
+        .mood-tired {
+            background-color: rgba(160, 160, 160, 0.2);
+            color: #a0a0a0;
+        }
+
+        .mood-badmood {
+            background-color: rgba(75, 0, 130, 0.2);
+            color: #4b0082;
+        }
+
+        .mood-relax {
+            background-color: rgba(144, 238, 144, 0.2);
+            color: #90ee90;
+        }
+
+        .mood-fun {
+            background-color: rgba(255, 105, 180, 0.2);
+            color: #ff69b4;
+        }
+
+        /* 仪表盘布局 */
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: clamp(20px, 3vw, 40px);
+            padding: 0 clamp(16px, 3vw, 30px);
+            max-width: 1200px;
+            margin: 0 auto;
+            margin-bottom: 60px;
+        }
+
+        /* 卡片样式 */
+        .female-card {
+            height: 100%;
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: clamp(16px, 3vw, 24px);
+            transition: all 0.3s ease;
+            background-color: white;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(156, 91, 128, 0.12);
+        }
+
+        .female-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(156, 91, 128, 0.15);
+        }
+
+        .female-card h3 {
+            font-size: clamp(18px, 2.5vw, 24px);
+            margin-bottom: 15px;
+            color: #4A2C40;
+        }
+
+        .female-card p {
+            font-size: clamp(14px, 1.5vw, 16px);
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        /* 卡片图标 */
+        .card-icon {
+            font-size: 48px;
+            color: #E57C9F;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        /* 按钮样式 */
+        .female-button {
+            width: 100%;
+            max-width: 200px;
+            margin: 0 auto;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: clamp(14px, 1.5vw, 16px);
+            transition: all 0.3s ease;
+        }
+
+        .female-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(229, 124, 159, 0.3);
+        }
+
+        /* 健康贴士区域 */
+        .health-tips {
+            background-color: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 1200px;
+            margin: 80px auto 40px;
+            box-shadow: 0 4px 20px rgba(156, 91, 128, 0.12);
+            position: relative;
+        }
+
+        .health-tips::before {
+            content: '';
+            display: block;
+            height: 30px;
+            width: 100%;
+            position: absolute;
+            top: -30px;
+        }
+
+        .tips-title {
+            color: #4A2C40;
+            font-size: clamp(18px, 2.5vw, 22px);
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .tip-card {
+            background-color: rgba(229, 124, 159, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid #E57C9F;
+        }
+
+        .tip-card h4 {
+            color: #4A2C40;
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: clamp(16px, 2vw, 18px);
+        }
+
+        .tip-card p {
+            color: #666;
+            margin: 0;
+            font-size: clamp(14px, 1.5vw, 16px);
+        }
+
+        /* 底部样式 */
+        .footer {
+            margin-top: 80px;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        /* 响应式布局调整 */
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            nav a {
+                width: 100%;
+                text-align: center;
+            }
+
+            .header {
+                padding: 20px 10px;
+            }
+
+            .dashboard {
+                grid-template-columns: 1fr;
+                padding: 15px;
+                margin-bottom: 40px;
+                gap: 15px;
+            }
+
+            .health-summary {
+                margin-bottom: 30px;
+                margin-left: 15px;
+                margin-right: 15px;
+            }
+            
+            .featured-image {
+                margin: 35px 15px;
+            }
+            
+            .health-overview {
+                padding: 20px;
+                margin: 45px 15px; 
+            }
+            
+            .health-tips {
+                margin-top: 60px;
+                margin-left: 15px;
+                margin-right: 15px;
+                padding: 25px;
+            }
+            
+            .footer {
+                margin-top: 60px;
+            }
+            
+            .mood-container {
+                margin-top: 40px;
+                padding: 20px;
+            }
+            
+            .mood-grid {
+                grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+                gap: 10px;
+            }
+            
+            .mood-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 20px;
+            }
+            
+            .mood-label {
+                font-size: 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .female-card {
+                padding: 15px;
+            }
+
+            .female-button {
+                padding: 10px 20px;
+            }
+
+            .stat-item {
+                min-width: 100px;
+                padding: 10px 5px;
+            }
+            
+            .health-summary {
+                margin-bottom: 25px;
+            }
+            
+            .featured-image {
+                margin: 30px 15px;
+            }
+            
+            .dashboard {
+                margin-bottom: 35px;
+                gap: 12px;
+            }
+            
+            .health-overview {
+                margin: 35px 15px;
+                padding: 20px;
+            }
+            
+            .health-tips {
+                margin-top: 50px;
+                padding: 20px;
+            }
+            
+            .footer {
+                margin-top: 50px;
+                padding: 30px 20px;
+            }
+            
+            .mood-container {
+                margin-top: 35px;
+                padding: 18px;
+            }
+            
+            .mood-grid {
+                grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+                gap: 8px;
+            }
+            
+            .mood-icon {
+                width: 35px;
+                height: 35px;
+                font-size: 18px;
+            }
+        }
+
+        .section-title {
+            color: var(--female-primary);
+            font-size: 22px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        .section-subtitle {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        /* 首图展示区样式 */
+        .featured-image {
+            max-width: 1200px;
+            margin: 50px auto;
+            padding: 0 20px;
+        }
+        
+        .featured-image .image-container {
+            display: block;
+            height: 400px;
+            overflow: hidden;
+            border-radius: 20px;
+            box-shadow: 0 8px 25px rgba(229, 124, 159, 0.25);
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .featured-image .image-container:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 35px rgba(229, 124, 159, 0.3);
+        }
+        
+        .featured-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.6s ease;
+        }
+        
+        .featured-image:hover img {
+            transform: scale(1.05);
+        }
+        
+        .featured-image .image-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(229, 124, 159, 0.9), rgba(229, 124, 159, 0) 200px);
+            padding: 60px 40px 40px;
+            color: white;
+        }
+        
+        .featured-image h3 {
+            margin: 0 0 15px 0;
+            font-size: clamp(22px, 4vw, 28px);
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .featured-image p {
+            margin: 0;
+            font-size: clamp(14px, 2vw, 18px);
+            max-width: 600px;
+            line-height: 1.6;
+            opacity: 0.95;
+        }
+        
+        @media (max-width: 768px) {
+            .featured-image .image-container {
+                height: 350px;
+            }
+            
+            .featured-image .image-overlay {
+                padding: 40px 30px 30px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .featured-image .image-container {
+                height: 300px;
+            }
+            
+            .featured-image .image-overlay {
+                padding: 30px 20px 20px;
+            }
+        }
+
+        /* 添加图片加载占位符样式 */
+        .image-container::before {
+            content: "图片加载中...";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f9f1f4;
+            color: #E57C9F;
+            font-size: 18px;
+            z-index: 1;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .image-container img:not([src]), 
+        .image-container img[src=""], 
+        .image-container img:not([complete]) + .image-container::before {
+            opacity: 1;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 导航栏 -->
+    <nav>
+        <div class="nav-container">
+            <a href="metrics.html">健康指标</a>
+            <a href="consultation.html">健康咨询</a>
+            <a href="messages.html">消息中心</a>
+            <a href="records.html">健康记录</a>
+        </div>
+    </nav>
+
+    <!-- 页面内容 -->
+    <div id="app">
+        <div class="header">
+            <h1 class="animated-title"><i class="ri-heart-pulse-line" style="color: #E57C9F; font-size: 0.9em; margin-right: 15px;"></i>Artemis</h1>
+            <h2>female health monitoring system</h2>
+        </div>
+
+        <!-- 健康数据摘要 -->
+        <div class="health-summary">
+            <h3 class="summary-title">健康数据摘要</h3>
+            <div class="summary-stats">
+                <div class="stat-item">
+                    <div class="stat-value">78</div>
+                    <div class="stat-label">平均心率(bpm)</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">36.5°</div>
+                    <div class="stat-label">平均体温</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">28</div>
+                    <div class="stat-label">当前周期(天)</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">5</div>
+                    <div class="stat-label">距离下次经期(天)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 首图展示区 -->
+        <div class="featured-image">
+            <div class="image-container">
+                <img src="https://images.pexels.com/photos/7991361/pexels-photo-7991361.jpeg?auto=compress&cs=tinysrgb&w=1200" 
+                     alt="女性健康呵护"
+                     onerror="this.onerror=null; this.src='https://img.freepik.com/free-photo/pretty-young-woman-with-flowers-face-posing-studio-looking-camera-thoughtful-spring-beauty-skincare-concept_74855-11245.jpg?w=1200&t=st=1714635004~exp=1714635604~hmac=cec28e06c3eb02f3a7bda9a15d9e4b3e1eb7e3f7c7fd93ca20b31b3c8e59a399';"
+                     loading="lazy">
+                <div class="image-overlay">
+                    <h3>呵护女性健康，关爱每一天</h3>
+                    <p>定期监测身体状况，掌握健康数据，让每一位女性都能更了解自己的身体，拥有健康美丽的生活。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 健康指标展示 -->
+            <div class="dashboard">
+            <!-- 心率 -->
+            <female-card title="心率">
+                <div class="card-content">
+                    <div class="card-icon">
+                        <i class="ri-heart-pulse-line"></i>
+                    </div>
+                    <h3>心率</h3>
+                    <p>查看你的心率数据</p>
+                    <female-button text="查看心率图表" type="primary" @click="goToPage('heart_rate_chart.html')"></female-button>
+                </div>
+                </female-card>
+
+            <!-- 体温 -->
+            <female-card title="体温">
+                <div class="card-content">
+                    <div class="card-icon">
+                        <i class="ri-temp-hot-line"></i>
+                    </div>
+                    <h3>体温</h3>
+                    <p>查看你的体温数据</p>
+                    <female-button text="查看体温图表" type="primary" @click="goToPage('temperature.html')"></female-button>
+                </div>
+                </female-card>
+
+            <!-- 经期 -->
+            <female-card title="经期">
+                <div class="card-content">
+                    <div class="card-icon">
+                        <i class="ri-calendar-event-line"></i>
+                    </div>
+                    <h3>经期</h3>
+                    <p>查看你的经期数据</p>
+                    <female-button text="查看经期图表" type="primary" @click="goToPage('menstrual.html')"></female-button>
+                </div>
+                </female-card>
+            </div>
+
+        <!-- 健康数据摘要后添加图片展示区 -->
+        <div class="health-overview">
+            <h3 class="overview-title"><i class="ri-emotion-happy-line"></i>记录心情</h3>
+            
+            <div class="image-container">
+                <img src="https://images.pexels.com/photos/3807770/pexels-photo-3807770.jpeg?auto=compress&cs=tinysrgb&w=1200" 
+                     alt="记录每日心情"
+                     onerror="this.onerror=null; this.src='https://img.freepik.com/free-photo/smiley-young-girl-showing-her-emotions_23-2148872423.jpg?w=1200&t=st=1714635085~exp=1714635685~hmac=a10c0a42e23e9eeb36dd52e9bfce0f2c28fb52cc94fa80ef0aaafa242be36f54';"
+                     loading="lazy">
+                <div class="image-overlay">
+                    <h4>记录今日的心情</h4>
+                    <p>追踪你的情绪变化，了解身心健康状态。</p>
+                </div>
+            </div>
+            
+            <div class="mood-container">
+                <h3 class="section-title">今日心情</h3>
+                <p class="section-subtitle">记录你今天的情绪状态</p>
+                
+                <div class="mood-grid">
+                    <div v-for="mood in moods" :key="mood.id" 
+                         class="mood-item" 
+                         :class="{ selected: selectedMood === mood.id }"
+                         @click="selectMood(mood.id)" 
+                         :data-mood="mood.id">
+                        <div class="mood-icon" :class="mood.color">
+                            <i :class="mood.icon"></i>
+                        </div>
+                        <div class="mood-label">{{ mood.label }}</div>
+                    </div>
+                </div>
+                
+                <div class="mood-submit">
+                    <female-button text="保存心情" type="success" @click="saveMood"></female-button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 健康贴士 -->
+            <div class="health-tips">
+            <h3 class="tips-title">健康贴士</h3>
+            <div class="tip-card">
+                <h4>经期保健</h4>
+                <p>经期期间注意保暖，避免剧烈运动和寒冷刺激，适当补充铁质食物如瘦肉、菠菜等。</p>
+                </div>
+            <div class="tip-card">
+                <h4>情绪调节</h4>
+                <p>通过正念冥想、深呼吸或温和的瑜伽来缓解压力和焦虑，保持心理健康。</p>
+            </div>
+        </div>
+
+        <!-- 返回按钮 -->
+        <div class="footer">
+            <female-button text="返回首页" type="secondary" @click="goToPage('index.html')"></female-button>
+        </div>
+    </div>
+
+    <!-- 引入Female UI组件 -->
+    <script src="female-ui-simple.js"></script>
+    <script>
+        // 创建Vue应用
+        const app = Vue.createApp({
+            data() {
+                return {
+                    selectedMood: null,
+                    moods: [
+                        { id: 'happy', label: '开心', icon: 'ri-emotion-happy-line', color: 'mood-happy' },
+                        { id: 'sad', label: '难过', icon: 'ri-emotion-sad-line', color: 'mood-sad' },
+                        { id: 'excited', label: '兴奋', icon: 'ri-emotion-laugh-line', color: 'mood-excited' },
+                        { id: 'calm', label: '平静', icon: 'ri-emotion-normal-line', color: 'mood-calm' },
+                        { id: 'frustrated', label: '沮丧', icon: 'ri-emotion-unhappy-line', color: 'mood-frustrated' },
+                        { id: 'tired', label: '疲倦', icon: 'ri-emotion-line', color: 'mood-tired' },
+                        { id: 'badmood', label: '低落', icon: 'ri-emotion-2-line', color: 'mood-badmood' },
+                        { id: 'relax', label: '放松', icon: 'ri-emotion-line', color: 'mood-relax' },
+                        { id: 'fun', label: '有趣', icon: 'ri-emotion-laugh-line', color: 'mood-fun' }
+                    ]
+                }
+            },
+            methods: {
+                goToPage(url) {
+                    window.location.href = url;
+                },
+                selectMood(moodId) {
+                    this.selectedMood = moodId;
+                    console.log('选择的心情:', moodId);
+                    
+                    // 清除所有选中样式
+                    document.querySelectorAll('.mood-item').forEach(item => {
+                        item.classList.remove('selected');
+                    });
+                    
+                    // 为当前选中项添加样式
+                    const selectedItem = document.querySelector(`.mood-item[data-mood="${moodId}"]`);
+                    if (selectedItem) {
+                        selectedItem.classList.add('selected');
+                    }
+                },
+                saveMood() {
+                    if (!this.selectedMood) {
+                        alert('请先选择一个心情');
+                        return;
+                    }
+                    
+                    // 保存心情到localStorage
+                    const today = new Date().toISOString().split('T')[0];
+                    const moodData = {
+                        date: today,
+                        mood: this.selectedMood
+                    };
+                    
+                    // 获取现有心情记录
+                    let moodHistory = JSON.parse(localStorage.getItem('moodHistory') || '[]');
+                    
+                    // 添加新记录
+                    moodHistory.push(moodData);
+                    
+                    // 保存回localStorage
+                    localStorage.setItem('moodHistory', JSON.stringify(moodHistory));
+                    
+                    // 显示成功消息
+                    alert('心情记录已保存');
+                    
+                    // 重置选择
+                    this.selectedMood = null;
+                    document.querySelectorAll('.mood-item').forEach(item => {
+                        item.classList.remove('selected');
+                    });
+                }
+            }
+        });
+        
+        // 注册组件
+        app.component('female-button', FemaleButton);
+        app.component('female-card', FemaleCard);
+        app.component('female-input', FemaleInput);
+        
+        // 挂载应用
+        app.mount('#app');
+        
+        // 检查用户是否已登录
+        if (!localStorage.getItem('isLoggedIn')) {
+            window.location.href = 'login.html';  // 如果未登录，跳转到登录页面
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>注册 - 女性健康监测系统</title>
+    <link rel="stylesheet" href="female-ui-styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14"></script>
+    <script src="female-ui-simple.js"></script>
+    <style>
+        .register-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #FFF5F7;
+            padding: 20px;
+        }
+
+        .register-card {
+            background-color: white;
+            border-radius: 20px;
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 4px 20px rgba(156, 91, 128, 0.12);
+        }
+
+        .register-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .register-title {
+            color: #4A2C40;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .register-subtitle {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #4A2C40;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #E57C9F;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #4A2C40;
+            box-shadow: 0 0 0 2px rgba(229, 124, 159, 0.2);
+        }
+
+        .register-button {
+            width: 100%;
+            padding: 12px;
+            background-color: #E57C9F;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 20px;
+        }
+
+        .register-button:hover {
+            background-color: #4A2C40;
+            transform: translateY(-2px);
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .login-link a {
+            color: #E57C9F;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .login-link a:hover {
+            color: #4A2C40;
+        }
+
+        .terms {
+            margin-top: 20px;
+            text-align: center;
+            color: #666;
+            font-size: 12px;
+        }
+
+        .terms a {
+            color: #E57C9F;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .terms a:hover {
+            color: #4A2C40;
+        }
+
+        @media (max-width: 480px) {
+            .register-card {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="register-container">
+            <div class="register-card">
+                <div class="register-header">
+                    <h2 class="register-title">创建账户</h2>
+                    <p class="register-subtitle">加入我们的健康监测系统</p>
+                </div>
+
+                <form @submit.prevent="handleRegister">
+                    <div class="form-group">
+                        <label for="username">用户名</label>
+                        <input 
+                            type="text" 
+                            id="username" 
+                            v-model="username" 
+                            placeholder="请输入用户名"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">电子邮箱</label>
+                        <input 
+                            type="email" 
+                            id="email" 
+                            v-model="email" 
+                            placeholder="请输入电子邮箱"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">密码</label>
+                        <input 
+                            type="password" 
+                            id="password" 
+                            v-model="password" 
+                            placeholder="请输入密码"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirmPassword">确认密码</label>
+                        <input 
+                            type="password" 
+                            id="confirmPassword" 
+                            v-model="confirmPassword" 
+                            placeholder="请再次输入密码"
+                            required
+                        >
+                    </div>
+
+                    <button type="submit" class="register-button">注册</button>
+                </form>
+
+                <div class="login-link">
+                    已有账户？<a href="login.html">立即登录</a>
+                </div>
+
+                <div class="terms">
+                    注册即表示您同意我们的<a href="#">服务条款</a>和<a href="#">隐私政策</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 创建Vue应用
+        const app = Vue.createApp({
+            data() {
+                return {
+                    username: '',
+                    email: '',
+                    password: '',
+                    confirmPassword: ''
+                }
+            },
+            methods: {
+                handleRegister() {
+                    if (this.password !== this.confirmPassword) {
+                        alert('两次输入的密码不一致');
+                        return;
+                    }
+                    
+                    // 这里添加注册逻辑
+                    console.log('注册信息：', {
+                        username: this.username,
+                        email: this.email,
+                        password: this.password
+                    });
+                }
+            }
+        });
+
+        // 挂载应用
+        app.mount('#app');
+    </script>
+</body>
+</html>
