@@ -1,10 +1,10 @@
-import paho.mqtt.client as mqtt  # type: ignore
+import paho.mqtt.client as mqtt  
 import json
 import time
 import random
 from datetime import datetime
-import mysql.connector # type: ignore
-from mysql.connector import Error # type: ignore
+import mysql.connector
+from mysql.connector import Error 
 
 # MQTT Server Configuration
 BROKER = "120.76.249.191"
