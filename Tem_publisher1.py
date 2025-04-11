@@ -1,21 +1,13 @@
-import paho.mqtt.client as mqtt  
+import paho.mqtt.client as mqtt 
 import json
 import time
 import random
 from datetime import datetime
-import mysql.connector
-from mysql.connector import Error 
 
 # MQTT Server Configuration
-BROKER = "120.76.249.191"
-PORT = 1883
+BROKER_ADDRESS = 120.76.249.191""
+BROKER_PORT = 1883
 TOPIC_TEMP = "health/wearable/temperature"
-
-# Database Configuration
-DB_HOST = "localhost"
-DB_USER = "your_username"
-DB_PASSWORD = "your_password"
-DB_NAME = "sql_tutorial1"
 
 # Temperature Threshold Configuration
 class TemperatureThresholds:
@@ -95,66 +87,29 @@ def on_publish(client, userdata, mid):
     """Callback function when sending data"""
     print(f"Data published, message ID: {mid}")
 
-def connect_to_database():
-    """Connect to the database"""
-    try:
-        connection = mysql.connector.connect(
-            host=DB_HOST,
-            user=DB_USER,
-            password=DB_PASSWORD,
-            database=DB_NAME
-        )
-        return connection
-    except Error as e:
-        print(f"Error connecting to database: {e}")
-        return None
-
-def insert_data_into_database(connection, user_id, temperature, record_time):
-    """Insert data into the temperature_sensor table"""
-    cursor = connection.cursor()
-    query = """
-    INSERT INTO temperature_sensor (user_ID, temperature, record_time)
-    VALUES (%s, %s, %s)
-    """
-    try:
-        cursor.execute(query, (user_id, temperature, record_time))
-        connection.commit()
-        print("Data inserted successfully")
-    except Error as e:
-        print(f"Error inserting data: {e}")
-    finally:
-        cursor.close()
-
 def publisher():
     """Temperature data publisher"""
     client = mqtt.Client()
     client.on_publish = on_publish
     temp_generator = TemperatureGenerator()
     
+    client.connect(BROKER_ADDRESS, BROKER_PORT, 60)
+    client.loop_start()
+    
     try:
-        client.connect(BROKER, PORT, 60)
-        client.loop_start()
-        
-        db_connection = connect_to_database()
-        
         while True:
             # Generate temperature data
             temp_data = temp_generator.generate_temperature()
             
             # Publish data to MQTT server
-            result = client.publish(TOPIC_TEMP, json.dumps(temp_data))
-            if result.rc == mqtt.MQTT_ERR_SUCCESS:
-                print(f"\nCurrent temperature: {temp_data['value']}°C")
-                print(f"Measurement time: {temp_data['timestamp']}")
-                if "warning" in temp_data:
-                    print(f"Warning: {temp_data['warning']}")
-                if "trend" in temp_data:
-                    print(f"Trend: {temp_data['trend']}")
-            else:
-                print(f"Failed to publish data, error code: {result.rc}")
+            payload = json.dumps(temp_data)
+            result = client.publish(TOPIC_TEMP, payload)
+            status = result[0]
             
-            # Insert data into database
-            insert_data_into_database(db_connection, 1, temp_data['value'], temp_data['timestamp'])
+            if status == 0:
+                print(f"Message sent at {temp_data['timestamp']}: {payload}")
+            else:
+                print("Failed to send message!")
             
             # Send data again after 30 seconds
             time.sleep(30)
@@ -170,3 +125,10 @@ def publisher():
 
 if __name__ == "__main__":
     publisher()
+
+    
+   
+     
+
+
+            
