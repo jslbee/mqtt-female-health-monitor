@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Menstrual Chart - Artemis</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- 引入Vue和Female UI样式 -->
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <link rel="stylesheet" href="female-ui-styles.css">
+  <!-- 引入图标库 -->
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+  <!-- 在这里添加MQTT库引用 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js"></script>
+  <!-- 在menstrual.html中 -->
+  <canvas id="menstrual-chart" width="400" height="200"></canvas>
+  <!-- 在此处添加表单 -->
+  <form id="menstrual-form" class="data-form">
+      <h3>记录月经周期</h3>
+      <div class="form-group">
+          <label for="menstrual-duration-input">月经持续天数:</label>
+          <input type="number" id="menstrual-duration-input" min="1" max="15" step="1" required>
+      </div>
+      <button type="submit" class="submit-btn">提交数据</button>
+  </form>
+    <style>
+    body {
+      background-color: #FFF5F7;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* 导航栏样式修改 */
+    nav {
+      background-color: #E57C9F;
+      padding: 15px 0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 10px rgba(229, 124, 159, 0.2);
+    }
+
+    .nav-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: clamp(20px, 4vw, 40px);
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      font-size: clamp(14px, 2vw, 18px);
+      padding: 8px 16px;
+            border-radius: 20px;
+      transition: all 0.3s ease;
+      white-space: nowrap;
+    }
+
+    nav a:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .container {
+            max-width: 1200px;
+      margin: 0 auto;
+      padding: clamp(16px, 3vw, 30px);
+      width: 100%;
+      box-sizing: border-box;
+        }
+
+    .header {
+            text-align: center;
+      margin-bottom: 30px;
+        }
+
+    .header-title {
+      color: #4A2C40;
+      font-size: clamp(24px, 3vw, 32px);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .header-title i {
+      color: #E57C9F;
+    }
+
+    .header-subtitle {
+            color: #666;
+      font-size: clamp(14px, 1.5vw, 16px);
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    /* 图表容器 */
+    .chart-container {
+      background-color: white;
+      border-radius: 20px;
+      padding: clamp(16px, 3vw, 30px);
+      margin: 20px auto;
+      box-shadow: 0 4px 20px rgba(156, 91, 128, 0.12);
+      transition: all 0.3s ease;
+        }
+
+    .chart-container:hover {
+      box-shadow: 0 8px 30px rgba(156, 91, 128, 0.15);
+    }
+
+    /* 经期摘要 */
+    .cycle-summary {
+            display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 15px;
+      margin-bottom: 25px;
+        }
+
+    .cycle-stat {
+      background-color: rgba(229, 124, 159, 0.05);
+            border-radius: 15px;
+      padding: 15px;
+            text-align: center;
+      transition: all 0.3s ease;
+        }
+
+    .cycle-stat:hover {
+      background-color: rgba(229, 124, 159, 0.1);
+      transform: translateY(-3px);
+        }
+
+    .stat-number {
+      font-size: clamp(22px, 2.5vw, 28px);
+            font-weight: bold;
+            color: #E57C9F;
+      margin-bottom: 5px;
+        }
+
+    .stat-title {
+      font-size: clamp(12px, 1.5vw, 14px);
+            color: #4A2C40;
+        }
+
+    /* 日历视图 */
+    .calendar-section {
+      margin-top: 30px;
+      background-color: white;
+      border-radius: 20px;
+      padding: clamp(16px, 3vw, 30px);
+      box-shadow: 0 4px 20px rgba(156, 91, 128, 0.12);
+        }
+
+    .section-title {
+            color: #4A2C40;
+      font-size: clamp(18px, 2.5vw, 22px);
+            margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-title i {
+      color: #E57C9F;
+    }
+
+    .calendar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .calendar-month {
+      font-size: 18px;
+      font-weight: bold;
+      color: #4A2C40;
+    }
+
+    .calendar-controls {
+      display: flex;
+      gap: 10px;
+    }
+
+    .calendar-button {
+      background-color: rgba(229, 124, 159, 0.1);
+      color: #4A2C40;
+      border: none;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .calendar-button:hover {
+      background-color: #E57C9F;
+      color: white;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+      gap: 5px;
+    }
+
+    .calendar-day-header {
+      text-align: center;
+      font-weight: bold;
+      padding: 5px;
+      color: #4A2C40;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            background-color: white;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+      border-radius: 10px;
+      font-size: 14px;
+      background-color: rgba(229, 124, 159, 0.05);
+      color: #4A2C40;
+            position: relative;
+      transition: all 0.3s ease;
+        }
+
+        .calendar-day:hover {
+      background-color: rgba(229, 124, 159, 0.1);
+      transform: scale(1.05);
+    }
+
+    .calendar-day.period {
+      background-color: rgba(229, 124, 159, 0.3);
+      color: #4A2C40;
+      font-weight: bold;
+        }
+
+    .calendar-day.fertile {
+      background-color: rgba(126, 184, 162, 0.2);
+      color: #4A2C40;
+        }
+
+        .calendar-day.ovulation {
+      background-color: rgba(126, 184, 162, 0.4);
+      color: #4A2C40;
+      font-weight: bold;
+        }
+
+        .calendar-day.today {
+            border: 2px solid #E57C9F;
+        }
+
+    .calendar-day.empty {
+      background-color: transparent;
+    }
+
+    .day-marker {
+      position: absolute;
+      bottom: 3px;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+    }
+
+    .period-marker {
+      background-color: #E57C9F;
+    }
+
+    .fertile-marker {
+      background-color: #7EB8A2;
+    }
+
+    /* 预测和建议部分 */
+    .prediction-section {
+            margin-top: 30px;
+      background-color: white;
+      border-radius: 20px;
+      padding: clamp(16px, 3vw, 30px);
+      box-shadow: 0 4px 20px rgba(156, 91, 128, 0.12);
+        }
+
+    .prediction-content {
+      color: #666;
+      font-size: clamp(14px, 1.5vw, 16px);
+      line-height: 1.6;
+    }
+
+    .prediction-card {
+      background-color: rgba(229, 124, 159, 0.05);
+      border-radius: 15px;
+      padding: 15px;
+            margin-bottom: 15px;
+      border-left: 4px solid #E57C9F;
+        }
+
+    .prediction-card.fertile {
+      background-color: rgba(126, 184, 162, 0.1);
+      border-left: 4px solid #7EB8A2;
+    }
+
+    .prediction-date {
+      font-size: 16px;
+      font-weight: bold;
+      color: #4A2C40;
+      margin-bottom: 5px;
+        }
+
+    .prediction-info {
+      font-size: 14px;
+            color: #666;
+    }
+
+    /* 经期健康建议 */
+    .tips-section {
+      margin-top: 30px;
+      background-color: white;
+      border-radius: 20px;
+      padding: clamp(16px, 3vw, 30px);
+      box-shadow: 0 4px 20px rgba(156, 91, 128, 0.12);
+    }
+
+    .tips-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    .tip-card {
+      background-color: rgba(229, 124, 159, 0.05);
+      border-radius: 15px;
+      padding: 15px;
+      transition: all 0.3s ease;
+    }
+
+    .tip-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 5px 15px rgba(229, 124, 159, 0.1);
+    }
+
+    .tip-icon {
+      font-size: 24px;
+      color: #E57C9F;
+            margin-bottom: 10px;
+    }
+
+    .tip-title {
+      font-size: 16px;
+      font-weight: bold;
+      color: #4A2C40;
+      margin-bottom: 10px;
+    }
+
+    .tip-content {
+      font-size: 14px;
+      color: #666;
+      line-height: 1.5;
+    }
+
+    /* 按钮容器 */
+    .button-container {
+      text-align: center;
+      margin-top: clamp(20px, 4vw, 40px);
+      padding-bottom: 20px;
+    }
+
+    /* 按钮样式 */
+    .female-button {
+      width: 100%;
+      max-width: 200px;
+      margin: 0 auto;
+      padding: 12px 24px;
+      border-radius: 25px;
+      font-size: clamp(14px, 1.5vw, 16px);
+      transition: all 0.3s ease;
+    }
+
+    .female-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(229, 124, 159, 0.3);
+    }
+
+    /* 波纹按钮效果 */
+    .female-button {
+            position: relative;
+      overflow: hidden;
+        }
+
+    .female-button::after {
+      content: '';
+            position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 5px;
+      height: 5px;
+      background: rgba(255, 255, 255, 0.5);
+      opacity: 0;
+      border-radius: 100%;
+      transform: scale(1, 1) translate(-50%);
+      transform-origin: 50% 50%;
+    }
+
+    .female-button:focus:not(:active)::after {
+      animation: ripple 1s ease-out;
+    }
+
+    @keyframes ripple {
+      0% {
+        transform: scale(0, 0);
+        opacity: 0.5;
+      }
+      100% {
+        transform: scale(100, 100);
+        opacity: 0;
+      }
+        }
+
+    /* 响应式布局调整 */
+        @media (max-width: 768px) {
+      .container {
+        padding: 15px;
+            }
+
+      .chart-container, .calendar-section, .prediction-section, .tips-section {
+        padding: 15px;
+      }
+
+      .cycle-summary {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .tips-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .calendar-grid {
+        gap: 2px;
+      }
+
+      .calendar-day {
+        font-size: 12px;
+      }
+
+      .header-title {
+        flex-direction: column;
+      }
+
+      .nav-container {
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      nav a {
+        width: 100%;
+        text-align: center;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .calendar-day-header {
+        font-size: 12px;
+      }
+
+      .calendar-day {
+        font-size: 10px;
+      }
+
+      .female-button {
+        padding: 10px 20px;
+      }
+
+      .cycle-summary {
+        grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+    <!-- 导航栏 -->
+    <nav>
+      <div class="nav-container">
+        <a href="metrics.html">Health Metrics</a>
+        <a href="consultation.html">Health Consultation</a>
+        <a href="messages.html">Messages</a>
+        <a href="records.html">Health Records</a>
+      </div>
+    </nav>
+        
+    <div class="container">
+      <div class="header">
+        <h2 class="header-title"><i class="ri-calendar-event-line"></i>Menstrual Data</h2>
+        <p class="header-subtitle">Track your menstrual cycle to understand your physiological condition and health status.</p>
+      </div>
+
+      <!-- 经期摘要 -->
+      <div class="cycle-summary">
+        <div class="cycle-stat">
+          <div class="stat-number">28</div>
+          <div class="stat-title">Average Cycle Length (days)</div>
+                </div>
+        <div class="cycle-stat">
+          <div class="stat-number">5</div>
+          <div class="stat-title">Average Period Days</div>
+                </div>
+        <div class="cycle-stat">
+          <div class="stat-number">14</div>
+          <div class="stat-title">Average Ovulation Day (cycle day)</div>
+        </div>
+        <div class="cycle-stat">
+          <div class="stat-number">5</div>
+          <div class="stat-title">Days Until Next Period</div>
+                </div>
+            </div>
+
+      <!-- 经期图表 -->
+      <div class="chart-container">
+  <canvas id="menstrualChart"></canvas>
+      </div>
+
+      <!-- 日历视图 -->
+      <div class="calendar-section">
+        <h3 class="section-title"><i class="ri-calendar-line"></i>Cycle Calendar</h3>
+        <div class="calendar-header">
+          <div class="calendar-month">October 2023</div>
+          <div class="calendar-controls">
+            <button class="calendar-button"><i class="ri-arrow-left-s-line"></i></button>
+            <button class="calendar-button"><i class="ri-arrow-right-s-line"></i></button>
+          </div>
+        </div>
+                <div class="calendar-grid">
+          <!-- 星期标题 -->
+          <div class="calendar-day-header">Sun</div>
+          <div class="calendar-day-header">Mon</div>
+          <div class="calendar-day-header">Tue</div>
+          <div class="calendar-day-header">Wed</div>
+          <div class="calendar-day-header">Thu</div>
+          <div class="calendar-day-header">Fri</div>
+          <div class="calendar-day-header">Sat</div>
+          
+          <!-- 空白天 -->
+          <div class="calendar-day empty"></div>
+          <div class="calendar-day empty"></div>
+          <div class="calendar-day empty"></div>
+          <div class="calendar-day empty"></div>
+          <div class="calendar-day empty"></div>
+                    <div class="calendar-day">1</div>
+                    <div class="calendar-day">2</div>
+          
+                    <div class="calendar-day">3</div>
+                    <div class="calendar-day">4</div>
+          <div class="calendar-day period">5</div>
+          <div class="calendar-day period">6</div>
+          <div class="calendar-day period">7</div>
+          <div class="calendar-day period">8</div>
+          <div class="calendar-day period">9</div>
+          
+                    <div class="calendar-day">10</div>
+                    <div class="calendar-day">11</div>
+                    <div class="calendar-day">12</div>
+                    <div class="calendar-day">13</div>
+          <div class="calendar-day fertile">14</div>
+          <div class="calendar-day fertile">15</div>
+          <div class="calendar-day fertile">16</div>
+          
+          <div class="calendar-day fertile">17</div>
+          <div class="calendar-day ovulation">18</div>
+          <div class="calendar-day fertile">19</div>
+          <div class="calendar-day fertile">20</div>
+          <div class="calendar-day today">21</div>
+                    <div class="calendar-day">22</div>
+                    <div class="calendar-day">23</div>
+          
+                    <div class="calendar-day">24</div>
+                    <div class="calendar-day">25</div>
+                    <div class="calendar-day">26</div>
+                    <div class="calendar-day">27</div>
+                    <div class="calendar-day">28</div>
+                    <div class="calendar-day">29</div>
+                    <div class="calendar-day">30</div>
+          
+                    <div class="calendar-day">31</div>
+          <div class="calendar-day empty"></div>
+          <div class="calendar-day empty"></div>
+          <div class="calendar-day empty"></div>
+          <div class="calendar-day empty"></div>
+          <div class="calendar-day empty"></div>
+          <div class="calendar-day empty"></div>
+                </div>
+            </div>
+
+      <!-- 预测部分 -->
+      <div class="prediction-section">
+        <h3 class="section-title"><i class="ri-timer-line"></i>Cycle Prediction</h3>
+        <div class="prediction-content">
+          <div class="prediction-card">
+            <div class="prediction-date">Oct 28 - Nov 3</div>
+            <div class="prediction-info">Expected next period date range, calculated based on your historical cycle length.</div>
+          </div>
+          <div class="prediction-card fertile">
+            <div class="prediction-date">Oct 14 - Oct 20</div>
+            <div class="prediction-info">Expected ovulation period, higher chance of conception during this time.</div>
+          </div>
+          <p>These predictions are based on your past menstrual cycle data and are for reference only. Each person's physical condition is different, and cycles may vary.</p>
+        </div>
+      </div>
+
+      <!-- 经期健康建议 -->
+      <div class="tips-section">
+        <h3 class="section-title"><i class="ri-heart-3-line"></i>Menstrual Health Tips</h3>
+        <div class="tips-grid">
+          <div class="tip-card">
+            <div class="tip-icon"><i class="ri-water-flash-line"></i></div>
+            <div class="tip-title">Stay Hydrated</div>
+            <div class="tip-content">Maintain adequate water intake during your period to help reduce bloating and water retention.</div>
+          </div>
+          <div class="tip-card">
+            <div class="tip-icon"><i class="ri-rest-time-line"></i></div>
+            <div class="tip-title">Get Enough Rest</div>
+            <div class="tip-content">Ensure sufficient sleep to help your body recover and alleviate menstrual fatigue.</div>
+          </div>
+          <div class="tip-card">
+            <div class="tip-icon"><i class="ri-leaf-line"></i></div>
+            <div class="tip-title">Balanced Diet</div>
+            <div class="tip-content">Increase intake of iron-rich foods such as dark leafy vegetables, red meat, and legumes.</div>
+          </div>
+          <div class="tip-card">
+            <div class="tip-icon"><i class="ri-mental-health-line"></i></div>
+            <div class="tip-title">Relax Your Mind</div>
+            <div class="tip-content">Try meditation or gentle yoga to help alleviate mood swings associated with premenstrual syndrome.</div>
+            </div>
+        </div>
+    </div>
+
+      <!-- 返回按钮 -->
+      <div class="button-container">
+        <female-button text="Back to Health Metrics" type="secondary" @click="goToPage('metrics.html')"></female-button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 引入Female UI组件 -->
+  <script src="female-ui-simple.js"></script>
+  <script>
+        // 创建Vue应用
+        const app = Vue.createApp({
+            methods: {
+        goToPage(url) {
+          window.location.href = url;
+                }
+            }
+        });
+    
+    // 注册组件
+    app.component('female-button', FemaleButton);
+
+        // 挂载应用
+        app.mount('#app');
+
+    // 图表初始化
+    var ctx = document.getElementById('menstrualChart').getContext('2d');
+    var menstrualChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['Cycle 1', 'Cycle 2', 'Cycle 3', 'Cycle 4'],
+        datasets: [{
+          label: 'Period Days',
+          data: [5, 6, 5, 7],
+          backgroundColor: '#E57C9F',
+          borderColor: '#E57C9F',
+          borderWidth: 1
+        },
+        {
+          label: 'Cycle Length',
+          data: [28, 29, 27, 30],
+          backgroundColor: 'rgba(229, 124, 159, 0.3)',
+          borderColor: '#E57C9F',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'top',
+            labels: {
+              color: '#4A2C40'
+            }
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            grid: {
+              color: 'rgba(74, 44, 64, 0.1)'
+            },
+            ticks: {
+              color: '#4A2C40'
+            }
+          },
+          x: {
+            grid: {
+              color: 'rgba(74, 44, 64, 0.1)'
+            },
+            ticks: {
+              color: '#4A2C40'
+            }
+          }
+        }
+      }
+    });
+  </script>
+</body>
+</html>

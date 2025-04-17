@@ -1,0 +1,131 @@
+/* 引入 Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Open+Sans:wght@400;700&display=swap');
+
+body {
+    font-family: 'Open Sans', sans-serif;
+    text-align: center;
+    padding: 0;
+    margin: 0;
+    background-color: #fdeff9; /* 浅粉色背景 */
+}
+
+h1 {
+    font-family: 'Pacifico', cursive;
+    color: #ff69b4; /* 粉色标题 */
+    font-size: 36px;
+    margin-bottom: 20px;
+}
+
+h2 {
+    color: #ff69b4;
+    font-size: 24px;
+}
+
+p {
+    font-size: 18px;
+    color: #555;
+}
+
+a {
+    color: #ff69b4;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* 导航栏样式 */
+nav {
+    background-color: #ffb6c1; /* 淡粉色导航栏 */
+    display: flex;
+    justify-content: center;
+    padding: 10px 0;
+}
+
+nav a {
+    color: white;
+    margin: 0 20px;
+    font-size: 18px;
+}
+
+nav a:hover {
+    text-decoration: underline;
+}
+
+/* 按钮样式 */
+.button {
+    background-color: #ff69b4; /* 粉色按钮 */
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    text-decoration: none;
+    display: inline-block;
+    margin-top: 20px;
+}
+
+.button:hover {
+    background-color: #ff1493; /* 深粉色按钮悬停效果 */
+}
+
+/* 健康指标卡片样式 */
+.dashboard {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    padding: 20px;
+}
+
+.metric-card {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    width: 250px;
+    text-align: center;
+}
+
+.metric-card h3 {
+    color: #ff69b4;
+    font-size: 20px;
+    margin-bottom: 10px;
+}
+
+.metric-card p {
+    color: #555;
+    margin-bottom: 20px;
+}
+
+.metric-card button {
+    background-color: #ff69b4;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.metric-card button:hover {
+    background-color: #ff1493;
+}
+
+/* 返回按钮样式 */
+.back-button {
+    background-color: #ff69b4;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 20px;
+}
+
+.back-button:hover {
+    background-color: #ff1493;
+}

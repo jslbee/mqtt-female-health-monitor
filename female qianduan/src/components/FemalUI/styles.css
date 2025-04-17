@@ -1,0 +1,589 @@
+/* Femel UI 组件库样式 - 女性健康系统UI */
+
+:root {
+  /* 主色调变量 */
+  --femel-primary: #E57C9F;
+  --femel-secondary: #F4AFBB;
+  --femel-accent: #AE5F87;
+  --femel-background: #FFF5F7;
+  --femel-text: #4A2C40;
+  --femel-success: #7EB8A2;
+  --femel-warning: #F9C096;
+  --femel-error: #E86B6B;
+  --femel-neutral: #F0E4EB;
+  --femel-white: #FFFFFF;
+  --femel-shadow: rgba(156, 91, 128, 0.12);
+
+  /* 间距变量 */
+  --femel-spacing-xs: 4px;
+  --femel-spacing-sm: 8px;
+  --femel-spacing-md: 16px;
+  --femel-spacing-lg: 24px;
+  --femel-spacing-xl: 32px;
+
+  /* 边框变量 */
+  --femel-border-radius-sm: 8px;
+  --femel-border-radius-md: 12px;
+  --femel-border-radius-lg: 20px;
+  --femel-border-radius-full: 999px;
+
+  /* 字体变量 */
+  --femel-font-size-xs: 12px;
+  --femel-font-size-sm: 14px;
+  --femel-font-size-md: 16px;
+  --femel-font-size-lg: 18px;
+  --femel-font-size-xl: 24px;
+
+  /* 过渡变量 */
+  --femel-transition: all 0.3s ease;
+}
+
+/* ===== 按钮样式 ===== */
+.femel-button {
+  border: none;
+  outline: none;
+  border-radius: var(--femel-border-radius-full);
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--femel-transition);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 10px var(--femel-shadow);
+}
+
+.femel-button-primary {
+  background-color: var(--femel-primary);
+  color: var(--femel-white);
+}
+
+.femel-button-primary:hover {
+  background-color: #d66a8d;
+}
+
+.femel-button-secondary {
+  background-color: var(--femel-secondary);
+  color: var(--femel-text);
+}
+
+.femel-button-secondary:hover {
+  background-color: #e9a0ac;
+}
+
+.femel-button-outline {
+  background-color: transparent;
+  color: var(--femel-primary);
+  border: 1.5px solid var(--femel-primary);
+  box-shadow: none;
+}
+
+.femel-button-outline:hover {
+  background-color: rgba(229, 124, 159, 0.1);
+}
+
+.femel-button-text {
+  background-color: transparent;
+  color: var(--femel-primary);
+  box-shadow: none;
+}
+
+.femel-button-text:hover {
+  background-color: rgba(229, 124, 159, 0.1);
+}
+
+.femel-button-small {
+  padding: 6px 16px;
+  font-size: var(--femel-font-size-xs);
+}
+
+.femel-button-medium {
+  padding: 10px 24px;
+  font-size: var(--femel-font-size-sm);
+}
+
+.femel-button-large {
+  padding: 14px 30px;
+  font-size: var(--femel-font-size-md);
+}
+
+.femel-button-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ===== 输入框样式 ===== */
+.femel-input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  margin-bottom: var(--femel-spacing-md);
+}
+
+.femel-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1.5px solid var(--femel-neutral);
+  border-radius: var(--femel-border-radius-md);
+  background-color: var(--femel-white);
+  color: var(--femel-text);
+  font-size: var(--femel-font-size-sm);
+  transition: var(--femel-transition);
+}
+
+.femel-input:focus {
+  border-color: var(--femel-primary);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(229, 124, 159, 0.2);
+}
+
+.femel-input::placeholder {
+  color: #b5a3af;
+}
+
+.femel-input-icon {
+  position: absolute;
+  left: 12px;
+  color: #b5a3af;
+}
+
+.femel-input-icon + .femel-input {
+  padding-left: 40px;
+}
+
+.femel-input-error .femel-input {
+  border-color: var(--femel-error);
+}
+
+.femel-input-error .femel-input:focus {
+  box-shadow: 0 0 0 3px rgba(232, 107, 107, 0.2);
+}
+
+.femel-input-error-message {
+  color: var(--femel-error);
+  font-size: var(--femel-font-size-xs);
+  margin-top: var(--femel-spacing-xs);
+}
+
+/* ===== 卡片样式 ===== */
+.femel-card {
+  background-color: var(--femel-white);
+  border-radius: var(--femel-border-radius-lg);
+  box-shadow: 0 4px 20px var(--femel-shadow);
+  overflow: hidden;
+  margin-bottom: var(--femel-spacing-lg);
+}
+
+.femel-card-header {
+  padding: var(--femel-spacing-md) var(--femel-spacing-lg);
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid rgba(240, 228, 235, 0.5);
+}
+
+.femel-card-icon {
+  margin-right: var(--femel-spacing-sm);
+  color: var(--femel-primary);
+}
+
+.femel-card-title {
+  margin: 0;
+  font-size: var(--femel-font-size-lg);
+  color: var(--femel-text);
+  font-weight: 500;
+}
+
+.femel-card-content {
+  padding: var(--femel-spacing-lg);
+}
+
+.femel-card-soft {
+  background-color: var(--femel-background);
+  box-shadow: none;
+  border: 1.5px solid rgba(229, 124, 159, 0.1);
+}
+
+/* ===== 徽章样式 ===== */
+.femel-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: var(--femel-border-radius-full);
+  font-size: var(--femel-font-size-xs);
+  font-weight: 600;
+  color: var(--femel-white);
+}
+
+.femel-badge-primary {
+  background-color: var(--femel-primary);
+}
+
+.femel-badge-secondary {
+  background-color: var(--femel-secondary);
+}
+
+.femel-badge-success {
+  background-color: var(--femel-success);
+}
+
+.femel-badge-warning {
+  background-color: var(--femel-warning);
+}
+
+.femel-badge-error {
+  background-color: var(--femel-error);
+}
+
+.femel-badge-dot {
+  min-width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  padding: 0;
+}
+
+/* ===== 标签样式 ===== */
+.femel-tag {
+  display: inline-flex;
+  align-items: center;
+  border-radius: var(--femel-border-radius-full);
+  padding: 4px 12px;
+  font-size: var(--femel-font-size-xs);
+  margin-right: var(--femel-spacing-sm);
+  margin-bottom: var(--femel-spacing-sm);
+  background-color: var(--femel-neutral);
+  color: var(--femel-text);
+}
+
+.femel-tag-primary {
+  background-color: rgba(229, 124, 159, 0.15);
+  color: var(--femel-primary);
+}
+
+.femel-tag-secondary {
+  background-color: rgba(244, 175, 187, 0.15);
+  color: #d16b7f;
+}
+
+.femel-tag-success {
+  background-color: rgba(126, 184, 162, 0.15);
+  color: #558b78;
+}
+
+.femel-tag-warning {
+  background-color: rgba(249, 192, 150, 0.15);
+  color: #d98240;
+}
+
+.femel-tag-error {
+  background-color: rgba(232, 107, 107, 0.15);
+  color: #c94141;
+}
+
+.femel-tag-close {
+  margin-left: 6px;
+  font-size: var(--femel-font-size-sm);
+  cursor: pointer;
+}
+
+/* ===== 进度条样式 ===== */
+.femel-progress {
+  display: flex;
+  align-items: center;
+  margin-bottom: var(--femel-spacing-md);
+}
+
+.femel-progress-outer {
+  flex: 1;
+  background-color: var(--femel-neutral);
+  border-radius: var(--femel-border-radius-full);
+  overflow: hidden;
+  height: 8px;
+}
+
+.femel-progress-inner {
+  height: 100%;
+  background-color: var(--femel-primary);
+  border-radius: var(--femel-border-radius-full);
+  transition: width 0.3s ease;
+}
+
+.femel-progress-text {
+  margin-left: var(--femel-spacing-sm);
+  font-size: var(--femel-font-size-xs);
+  color: var(--femel-text);
+  min-width: 35px;
+  text-align: right;
+}
+
+.femel-progress-small .femel-progress-outer {
+  height: 4px;
+}
+
+.femel-progress-large .femel-progress-outer {
+  height: 12px;
+}
+
+/* ===== 单选按钮样式 ===== */
+.femel-radio {
+  display: flex;
+  align-items: center;
+  position: relative;
+  padding-left: 30px;
+  cursor: pointer;
+  font-size: var(--femel-font-size-sm);
+  margin-bottom: var(--femel-spacing-sm);
+  user-select: none;
+}
+
+.femel-radio input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.femel-radio-checkmark {
+  position: absolute;
+  left: 0;
+  height: 20px;
+  width: 20px;
+  background-color: var(--femel-white);
+  border: 2px solid var(--femel-neutral);
+  border-radius: 50%;
+  transition: var(--femel-transition);
+}
+
+.femel-radio input:checked ~ .femel-radio-checkmark {
+  border-color: var(--femel-primary);
+}
+
+.femel-radio input:checked ~ .femel-radio-checkmark:after {
+  content: "";
+  position: absolute;
+  display: block;
+  top: 4px;
+  left: 4px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--femel-primary);
+}
+
+.femel-radio-label {
+  color: var(--femel-text);
+}
+
+/* ===== 复选框样式 ===== */
+.femel-checkbox {
+  display: flex;
+  align-items: center;
+  position: relative;
+  padding-left: 30px;
+  cursor: pointer;
+  font-size: var(--femel-font-size-sm);
+  margin-bottom: var(--femel-spacing-sm);
+  user-select: none;
+}
+
+.femel-checkbox input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.femel-checkbox-checkmark {
+  position: absolute;
+  left: 0;
+  height: 20px;
+  width: 20px;
+  background-color: var(--femel-white);
+  border: 2px solid var(--femel-neutral);
+  border-radius: var(--femel-border-radius-sm);
+  transition: var(--femel-transition);
+}
+
+.femel-checkbox input:checked ~ .femel-checkbox-checkmark {
+  background-color: var(--femel-primary);
+  border-color: var(--femel-primary);
+}
+
+.femel-checkbox input:checked ~ .femel-checkbox-checkmark:after {
+  content: "";
+  position: absolute;
+  display: block;
+  left: 6px;
+  top: 2px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.femel-checkbox-label {
+  color: var(--femel-text);
+}
+
+/* ===== 提示框样式 ===== */
+.femel-alert {
+  padding: 12px 16px;
+  border-radius: var(--femel-border-radius-md);
+  margin-bottom: var(--femel-spacing-md);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.femel-alert-info {
+  background-color: rgba(244, 175, 187, 0.15);
+  color: var(--femel-primary);
+}
+
+.femel-alert-success {
+  background-color: rgba(126, 184, 162, 0.15);
+  color: #558b78;
+}
+
+.femel-alert-warning {
+  background-color: rgba(249, 192, 150, 0.15);
+  color: #d98240;
+}
+
+.femel-alert-error {
+  background-color: rgba(232, 107, 107, 0.15);
+  color: #c94141;
+}
+
+.femel-alert-close {
+  cursor: pointer;
+  font-size: var(--femel-font-size-lg);
+  margin-left: var(--femel-spacing-md);
+}
+
+/* ===== 加载中组件样式 ===== */
+.femel-spinner {
+  border-radius: 50%;
+  border: 3px solid rgba(229, 124, 159, 0.2);
+  border-top-color: var(--femel-primary);
+  animation: femel-spin 1s linear infinite;
+}
+
+@keyframes femel-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.femel-spinner-small {
+  width: 20px;
+  height: 20px;
+}
+
+.femel-spinner-medium {
+  width: 30px;
+  height: 30px;
+}
+
+.femel-spinner-large {
+  width: 40px;
+  height: 40px;
+}
+
+/* ===== 日期选择器样式 ===== */
+.femel-date-picker {
+  position: relative;
+  width: 100%;
+}
+
+.femel-date-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1.5px solid var(--femel-neutral);
+  border-radius: var(--femel-border-radius-md);
+  background-color: var(--femel-white);
+  color: var(--femel-text);
+  font-size: var(--femel-font-size-sm);
+  transition: var(--femel-transition);
+}
+
+.femel-date-input:focus {
+  border-color: var(--femel-primary);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(229, 124, 159, 0.2);
+}
+
+/* ===== 切换开关样式 ===== */
+.femel-switch {
+  position: relative;
+  display: inline-block;
+  width: 48px;
+  height: 24px;
+}
+
+.femel-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.femel-switch-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--femel-neutral);
+  transition: var(--femel-transition);
+  border-radius: var(--femel-border-radius-full);
+}
+
+.femel-switch-slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: var(--femel-transition);
+  border-radius: 50%;
+}
+
+.femel-switch input:checked + .femel-switch-slider {
+  background-color: var(--femel-primary);
+}
+
+.femel-switch input:checked + .femel-switch-slider:before {
+  transform: translateX(24px);
+}
+
+.femel-switch-small {
+  width: 36px;
+  height: 18px;
+}
+
+.femel-switch-small .femel-switch-slider:before {
+  height: 12px;
+  width: 12px;
+}
+
+.femel-switch-small input:checked + .femel-switch-slider:before {
+  transform: translateX(18px);
+}
+
+.femel-switch-large {
+  width: 60px;
+  height: 30px;
+}
+
+.femel-switch-large .femel-switch-slider:before {
+  height: 24px;
+  width: 24px;
+}
+
+.femel-switch-large input:checked + .femel-switch-slider:before {
+  transform: translateX(30px);
+} 

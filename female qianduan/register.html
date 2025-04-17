@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Women's Health Monitoring System</title>
+    <link rel="stylesheet" href="female-ui-styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14"></script>
+    <script src="female-ui-simple.js"></script>
+    <style>
+        .register-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #FFF5F7;
+            padding: 20px;
+        }
+
+        .register-card {
+            background-color: white;
+            border-radius: 20px;
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 4px 20px rgba(156, 91, 128, 0.12);
+        }
+
+        .register-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .register-title {
+            color: #4A2C40;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .register-subtitle {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #4A2C40;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #E57C9F;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #4A2C40;
+            box-shadow: 0 0 0 2px rgba(229, 124, 159, 0.2);
+        }
+
+        .register-button {
+            width: 100%;
+            padding: 12px;
+            background-color: #E57C9F;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 20px;
+        }
+
+        .register-button:hover {
+            background-color: #4A2C40;
+            transform: translateY(-2px);
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .login-link a {
+            color: #E57C9F;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .login-link a:hover {
+            color: #4A2C40;
+        }
+
+        .terms {
+            margin-top: 20px;
+            text-align: center;
+            color: #666;
+            font-size: 12px;
+        }
+
+        .terms a {
+            color: #E57C9F;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .terms a:hover {
+            color: #4A2C40;
+        }
+
+        @media (max-width: 480px) {
+            .register-card {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="register-container">
+            <div class="register-card">
+                <div class="register-header">
+                    <h2 class="register-title">Create Account</h2>
+                    <p class="register-subtitle">Join our health monitoring system</p>
+                </div>
+
+                <form @submit.prevent="handleRegister">
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input 
+                            type="text" 
+                            id="username" 
+                            v-model="username" 
+                            placeholder="Enter your username"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input 
+                            type="email" 
+                            id="email" 
+                            v-model="email" 
+                            placeholder="Enter your email"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input 
+                            type="password" 
+                            id="password" 
+                            v-model="password" 
+                            placeholder="Enter your password"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirmPassword">Confirm Password</label>
+                        <input 
+                            type="password" 
+                            id="confirmPassword" 
+                            v-model="confirmPassword" 
+                            placeholder="Confirm your password"
+                            required
+                        >
+                    </div>
+
+                    <button type="submit" class="register-button">Register</button>
+                </form>
+
+                <div class="login-link">
+                    Already have an account? <a href="login.html">Login now</a>
+                </div>
+
+                <div class="terms">
+                    By registering, you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Create Vue app
+        const app = Vue.createApp({
+            data() {
+                return {
+                    username: '',
+                    email: '',
+                    password: '',
+                    confirmPassword: ''
+                }
+            },
+            methods: {
+                handleRegister() {
+                    if (this.password !== this.confirmPassword) {
+                        alert('Passwords do not match');
+                        return;
+                    }
+                    
+                    // Add registration logic here
+                    console.log('Registration info:', {
+                        username: this.username,
+                        email: this.email,
+                        password: this.password
+                    });
+                }
+            }
+        });
+
+        // Mount app
+        app.mount('#app');
+    </script>
+</body>
+</html>
