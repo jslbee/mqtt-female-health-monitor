@@ -6,22 +6,39 @@ function goToRecords() {
   }
   
 // MQTT客户端配置
-const mqttClient = {
-    host: '120.76.249.191', // MQTT服务器地址
-    port: 1883, // MQTT端口
-    clientId: 'web-client-' + Math.random().toString(16),
-   
+const mqttConfig = {
+    host: '120.76.249.191',  // 你的MQTT服务器地址
+    port: 9001,              // WebSocket端口（通常是9001或8083）
+    path: '/mqtt',           // WebSocket路径，根据你的服务器配置可能不需要
+    clientId: 'web-client-' + Math.random().toString(16).substr(2, 8)
 };
 
 // 创建MQTT客户端
-const client = new Paho.MQTT.Client(mqttClient.host, mqttClient.port, mqttClient.clientId);
+const client = new Paho.MQTT.Client(
+  mqttConfig.host, 
+  mqttConfig.port, 
+  mqttConfig.path,
+  mqttConfig.clientId
+);
 
 // 连接选项
 const options = {
-    timeout: 3,
-    onSuccess: onConnect,
-    onFailure: onFailure,
+  timeout: 3,
+  onSuccess: onConnect,
+  onFailure: function(e) {
+    console.log("连接失败: " + e.errorMessage);
+    setTimeout(connect, 5000); // 5秒后重试
+  }
 };
+
+// 连接函数
+function connect() {
+  console.log("尝试连接到MQTT服务器...");
+  client.connect(options);
+}
+
+// 初始连接
+connect();
 
 // 连接成功回调
 function onConnect() {
@@ -51,12 +68,6 @@ function onConnect() {
     }
 }
 
-
-// 连接失败回调
-function onFailure(error) {
-    console.error('MQTT连接失败:', error);
-}
-
 // 消息接收处理
 client.onMessageArrived = function(message) {
     console.log('收到消息:', message.payloadString);
@@ -64,84 +75,6 @@ client.onMessageArrived = function(message) {
     handleMQTTData(message.payloadString);
 };
 
-// 处理MQTT数据
-// 处理MQTT数据
-function handleMQTTData(data) {
-    try {
-        const parsedData = JSON.parse(data);
-        
-        // 判断数据类型并更新相应的UI
-        if (parsedData.heart_rate) {
-            // 更新心率显示
-            updateHeartRateUI(parsedData);
-        } else if (parsedData.value || parsedData.temp) { // 体温数据
-            // 更新体温显示
-            updateTemperatureUI(parsedData);
-        } else if (parsedData.duration) { // 月经周期数据
-            // 更新月经周期显示
-            updateMenstrualUI(parsedData);
-        }
-    } catch (error) {
-        console.error('数据处理错误:', error);
-    }
-}
-
-// 更新心率UI的函数
-function updateHeartRateUI(data) {
-    console.log('更新心率UI:', data);
-    
-    // 获取心率显示元素
-    const heartRateElement = document.getElementById('heart-rate-value');
-    if (heartRateElement) {
-        heartRateElement.textContent = data.heart_rate.toFixed(1);
-    }
-    
-    // 更新状态显示
-    const statusElement = document.getElementById('heart-rate-status');
-    if (statusElement && data.health_status) {
-        statusElement.textContent = data.health_status;
-    }
-    
-    // 更新图表（如果存在）
-    if (typeof updateHeartRateChart === 'function') {
-        updateHeartRateChart(data);
-    }
-}
-
-// 更新体温UI的函数
-function updateTemperatureUI(data) {
-    console.log('更新体温UI:', data);
-    
-    // 获取体温值（处理不同的数据格式）
-    const temperature = data.value || data.temp;
-    
-    // 获取体温显示元素
-    const tempElement = document.getElementById('temperature-value');
-    if (tempElement) {
-        tempElement.textContent = temperature.toFixed(1);
-    }
-    
-    // 更新体温状态
-    const tempStatusElement = document.getElementById('temperature-status');
-    if (tempStatusElement) {
-        let status = '正常';
-        
-        if (temperature < 36.0) {
-            status = '偏低';
-        } else if (temperature > 37.2) {
-            status = '偏高';
-        }
-        
-        tempStatusElement.textContent = status;
-    }
-    
-    // 更新图表（如果存在）
-    if (typeof updateTemperatureChart === 'function') {
-        updateTemperatureChart(data);
-    }
-}
-
-// 更新月经周期UI的函数
 // 处理MQTT数据
 function handleMQTTData(data) {
     try {
@@ -563,4 +496,60 @@ function submitMenstrualData(event) {
     // 提示用户
     alert('月经周期数据已提交');
 }
+
+const API_BASE_URL = 'http://your-server-ip:3000/api';
+
+// 加载历史心率数据
+async function loadHeartRateHistory() {
+  try {
+    const response = await fetch(`${API_BASE_URL}/heart_rate`);
+    const data = await response.json();
+    
+    if (data.length > 0 && heartRateChart) {
+      // 提取最近10条数据
+      const recentData = data.slice(-10);
+      
+      // 更新图表数据
+      heartRateChart.data.labels = recentData.map(item => {
+        const date = new Date(item.timestamp);
+        return date.toLocaleTimeString();
+      });
+      
+      heartRateChart.data.datasets[0].data = recentData.map(item => item.heart_rate);
+      heartRateChart.update();
+    }
+  } catch (error) {
+    console.error('加载心率历史数据失败:', error);
+  }
+}
+
+// 同样方式添加体温和月经周期数据加载函数
+async function loadTemperatureHistory() {
+  // 类似实现...
+}
+
+async function loadMenstrualHistory() {
+  // 类似实现...
+}
+
+// 在页面加载完成时调用这些函数
+document.addEventListener('DOMContentLoaded', function() {
+  initCharts();
+  
+  // 根据当前页面加载相应的历史数据
+  const currentPage = window.location.pathname.split('/').pop();
+  
+  if (currentPage.includes('heart_rate')) {
+    loadHeartRateHistory();
+  } else if (currentPage.includes('temperature')) {
+    loadTemperatureHistory();
+  } else if (currentPage.includes('menstrual')) {
+    loadMenstrualHistory();
+  } else if (currentPage === 'metrics.html') {
+    // 加载所有数据
+    loadHeartRateHistory();
+    loadTemperatureHistory();
+    loadMenstrualHistory();
+  }
+});
   
