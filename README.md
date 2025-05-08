@@ -1,33 +1,69 @@
-# mqtt-female-health-monitor
+# Artemis - 女性健康管理系统
 
-# Women's Health Monitoring System (Based on MQTT Protocol)
+## 项目简介
+Artemis 是一个基于 Vue 3 开发的女性健康管理系统，提供健康指标监测、预测分析、消息中心等功能。系统采用前后端分离架构，使用现代化的技术栈构建。
 
-This project is a health monitoring system designed for women's well-being, utilizing the MQTT protocol for real-time data transmission. The system focuses on collecting and visualizing health-related data such as:
+## 功能特点
+- 健康指标监测（心率、体温、经期）
+- 智能预测分析
+- 实时数据展示
+- 响应式设计，支持移动端和桌面端
+- 用户认证与授权
 
-- Body temperature  
-- Emotional status  
-- Menstrual cycle  
+## 技术栈
+- Vue 3
+- Vue Router
+- Axios
+- Chart.js
+- Vite
+- Remix Icon
 
-Data can be collected via sensors or manual input, then transmitted to a server using the MQTT protocol. The backend stores and processes the data, and the frontend provides user-friendly visualizations and analysis.
+## 项目结构
+```
+artemis/
+├── src/
+│   ├── api/              # API 相关配置和服务
+│   │   ├── config.js     # Axios 配置
+│   │   └── services.js   # API 服务
+│   ├── views/            # 页面组件
+│   │   └── Prediction.vue
+│   ├── App.vue           # 根组件
+│   └── main.js           # 应用入口
+├── index.html            # HTML 入口
+├── package.json          # 项目配置
+├── vite.config.js        # Vite 配置
+└── README.md            # 项目说明
+```
 
-## Project Structure (In Progress)
-## Features (Planned)
+## 开发环境设置
+1. 安装依赖：
+```bash
+npm install
+```
 
-- Real-time data transmission via MQTT  
-- Backend service for data storage and processing  
-- Visual display of health trends and statistics  
-- User-friendly interface with historical tracking
+2. 启动开发服务器：
+```bash
+npm run dev
+```
 
-## Development Status
+3. 构建生产版本：
+```bash
+npm run build
+```
 
-- [x] Initial project setup  
-- [ ] MQTT data receiver  
-- [ ] Frontend UI design  
-- [ ] Data analysis and visualization module  
+4. 预览生产版本：
+```bash
+npm run preview
+```
 
-## Future Plans
+## 环境要求
+- Node.js >= 18.0.0
+- npm >= 8.0.0
 
-- Integrate real sensors or mobile data input  
-- Add user account system for personalized tracking  
-- Deploy the system online for demonstration
+## 注意事项
+- 开发时请确保后端 API 服务已启动
+- 默认开发服务器端口为 3000
+- 生产环境部署前请确保已正确配置环境变量
 
+## 联系方式
+如有问题，请联系系统管理员。

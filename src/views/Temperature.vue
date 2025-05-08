@@ -1,0 +1,90 @@
+<template>
+  <div>
+    <NavBar />
+    <div class="container">
+      <div class="header">
+        <h1>Temperature Data</h1>
+      </div>
+      <div class="chart-container">
+        <div class="chart-title">
+          <i class="ri-temp-hot-line"></i>
+          <h2>Temperature Trend</h2>
+        </div>
+        <canvas ref="chartCanvas"></canvas>
+        <div class="data-card">
+          <h3>Temperature Health Tips</h3>
+          <p>Normal body temperature for adults typically ranges from 36.1°C to 37.2°C. Higher temperatures may indicate fever, while lower temperatures may suggest decreased immunity or other health issues. A slight increase in temperature during menstruation is normal.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import { ref, onMounted } from 'vue'
+import NavBar from '../components/NavBar.vue'
+import Chart from 'chart.js/auto'
+
+export default {
+  name: 'Temperature',
+  components: { NavBar },
+  setup() {
+    const chartCanvas = ref(null)
+    onMounted(() => {
+      const ctx = chartCanvas.value.getContext('2d')
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: ['Jan 1', 'Jan 2', 'Jan 3', 'Jan 4', 'Jan 5', 'Jan 6', 'Jan 7'],
+          datasets: [{
+            label: 'Temperature (°C)',
+            data: [36.5, 36.7, 36.6, 36.8, 36.9, 36.7, 36.5],
+            borderColor: '#E57C9F',
+            backgroundColor: 'rgba(229, 124, 159, 0.1)',
+            fill: true,
+            tension: 0.4,
+            borderWidth: 3,
+            pointBackgroundColor: '#E57C9F',
+            pointBorderColor: '#FFF',
+            pointRadius: 5,
+            pointHoverRadius: 7
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'top', labels: { color: '#4A2C40', font: { size: 14 } } },
+            tooltip: { backgroundColor: 'rgba(74, 44, 64, 0.8)' }
+          },
+          scales: {
+            y: {
+              beginAtZero: false,
+              min: 36,
+              max: 38,
+              grid: { color: 'rgba(74, 44, 64, 0.1)' },
+              ticks: { color: '#4A2C40', font: { size: 12 }, callback: v => v + '°C' },
+              title: { display: true, text: 'Temperature (°C)', color: '#4A2C40', font: { size: 14 } }
+            },
+            x: {
+              grid: { color: 'rgba(74, 44, 64, 0.05)' },
+              ticks: { color: '#4A2C40', font: { size: 12 } }
+            }
+          }
+        }
+      })
+    })
+    return { chartCanvas }
+  }
+}
+</script>
+
+<style scoped>
+.container { max-width: 1000px; margin: 0 auto; padding: 30px; }
+.header { text-align: center; padding: 30px 20px 40px; }
+.chart-container { background: white; border-radius: 8px; padding: 20px; margin: 20px 0; }
+.chart-title { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 25px; }
+.data-card { background: rgba(229,124,159,0.05); border-radius: 15px; padding: 20px; margin-top: 30px; border-left: 4px solid #E57C9F; }
+.data-card h3 { color: #4A2C40; margin-top: 0; margin-bottom: 15px; font-size: 18px; }
+.data-card p { color: #666; margin: 0; line-height: 1.6; }
+</style> 
