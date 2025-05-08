@@ -2,7 +2,7 @@
   <div class="health-records">
     <h1>Health Records</h1>
     <div class="profile-card">
-      <img src="../assets/avatar.png" alt="Avatar" class="avatar" />
+      <img src="https://cdn.jsdelivr.net/gh/edent/SuperTinyIcons/images/svg/user.svg" alt="Avatar" class="avatar" />
       <div class="profile-info">
         <h2>Jane Doe</h2>
         <p>Age: 28</p>
