@@ -1,40 +1,46 @@
 <template>
-  <div class="login-container">
-    <div class="login-card">
-      <div class="login-header">
-        <h2 class="login-title">欢迎回来</h2>
-        <p class="login-subtitle">登录你的健康监测账号</p>
+  <div>
+    <NavBar />
+    <div class="login-container">
+      <div class="login-card">
+        <div class="login-header">
+          <h2 class="login-title">欢迎回来</h2>
+          <p class="login-subtitle">登录你的健康监测账号</p>
+        </div>
+        <form @submit.prevent="handleLogin">
+          <div class="form-group">
+            <label for="username">用户名</label>
+            <input type="text" id="username" v-model="username" placeholder="请输入用户名" required />
+          </div>
+          <div class="form-group">
+            <label for="password">密码</label>
+            <input type="password" id="password" v-model="password" placeholder="请输入密码" required />
+          </div>
+          <div class="remember-forgot">
+            <label class="remember-me">
+              <input type="checkbox" v-model="rememberMe" />
+              <span>记住我</span>
+            </label>
+            <a href="#" class="forgot-password">忘记密码？</a>
+          </div>
+          <div class="button-container">
+            <button class="female-button" type="submit">登录</button>
+          </div>
+          <div class="register-link">
+            没有账号？<a href="#">立即注册</a>
+          </div>
+        </form>
       </div>
-      <form @submit.prevent="handleLogin">
-        <div class="form-group">
-          <label for="username">用户名</label>
-          <input type="text" id="username" v-model="username" placeholder="请输入用户名" required />
-        </div>
-        <div class="form-group">
-          <label for="password">密码</label>
-          <input type="password" id="password" v-model="password" placeholder="请输入密码" required />
-        </div>
-        <div class="remember-forgot">
-          <label class="remember-me">
-            <input type="checkbox" v-model="rememberMe" />
-            <span>记住我</span>
-          </label>
-          <a href="#" class="forgot-password">忘记密码？</a>
-        </div>
-        <div class="button-container">
-          <button class="female-button" type="submit">登录</button>
-        </div>
-        <div class="register-link">
-          没有账号？<a href="#">立即注册</a>
-        </div>
-      </form>
     </div>
   </div>
 </template>
 
 <script>
+import NavBar from '../components/NavBar.vue'
+
 export default {
   name: 'Login',
+  components: { NavBar },
   data() {
     return {
       username: '',

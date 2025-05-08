@@ -1,24 +1,27 @@
 <template>
-  <div class="health-records">
-    <h1>Health Records</h1>
-    <div class="profile-card">
-      <img src="https://cdn.jsdelivr.net/gh/edent/SuperTinyIcons/images/svg/user.svg" alt="Avatar" class="avatar" />
-      <div class="profile-info">
-        <h2>Jane Doe</h2>
-        <p>Age: 28</p>
-        <p>Gender: Female</p>
-        <button class="edit-btn">Edit Profile</button>
-      </div>
-    </div>
-    <div class="history-section">
-      <h2>Health History</h2>
-      <div v-for="(record, index) in healthHistory" :key="index" class="history-item" @click="toggleHistory(index)">
-        <div class="history-header">
-          <span class="date">{{ record.date }}</span>
-          <span class="condition">{{ record.condition }}</span>
+  <div>
+    <NavBar />
+    <div class="health-records">
+      <h1>Health Records</h1>
+      <div class="profile-card">
+        <img src="https://cdn.jsdelivr.net/gh/edent/SuperTinyIcons/images/svg/user.svg" alt="Avatar" class="avatar" />
+        <div class="profile-info">
+          <h2>Jane Doe</h2>
+          <p>Age: 28</p>
+          <p>Gender: Female</p>
+          <button class="edit-btn">Edit Profile</button>
         </div>
-        <div class="history-details" :class="{ 'expanded': record.expanded }">
-          {{ record.details }}
+      </div>
+      <div class="history-section">
+        <h2>Health History</h2>
+        <div v-for="(record, index) in healthHistory" :key="index" class="history-item" @click="toggleHistory(index)">
+          <div class="history-header">
+            <span class="date">{{ record.date }}</span>
+            <span class="condition">{{ record.condition }}</span>
+          </div>
+          <div class="history-details" :class="{ 'expanded': record.expanded }">
+            {{ record.details }}
+          </div>
         </div>
       </div>
     </div>
@@ -26,7 +29,11 @@
 </template>
 
 <script>
+import NavBar from '../components/NavBar.vue'
+
 export default {
+  name: 'HealthRecords',
+  components: { NavBar },
   data() {
     return {
       healthHistory: [

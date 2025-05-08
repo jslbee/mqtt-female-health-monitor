@@ -1,26 +1,31 @@
 <template>
-  <div class="predicted">
-    <h1>Prediction</h1>
-    <div class="prediction-section">
-      <h2>Heart Rate Prediction</h2>
-      <p>Predicted heart rate: {{ predictions.heartRate }} bpm</p>
-    </div>
-    <div class="prediction-section">
-      <h2>Temperature Prediction</h2>
-      <p>Predicted temperature: {{ predictions.temperature }}°C</p>
-    </div>
-    <div class="prediction-section">
-      <h2>Menstrual Cycle Prediction</h2>
-      <p>Predicted next cycle: {{ predictions.nextCycle }}</p>
+  <div>
+    <NavBar />
+    <div class="predicted">
+      <h1>Prediction</h1>
+      <div class="prediction-section">
+        <h2>Heart Rate Prediction</h2>
+        <p>Predicted heart rate: {{ predictions.heartRate }} bpm</p>
+      </div>
+      <div class="prediction-section">
+        <h2>Temperature Prediction</h2>
+        <p>Predicted temperature: {{ predictions.temperature }}°C</p>
+      </div>
+      <div class="prediction-section">
+        <h2>Menstrual Cycle Prediction</h2>
+        <p>Predicted next cycle: {{ predictions.nextCycle }}</p>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
+import NavBar from '../components/NavBar.vue'
 import { healthApi } from '../api/services';
 
 export default {
   name: 'Prediction',
+  components: { NavBar },
   data() {
     return {
       predictions: {

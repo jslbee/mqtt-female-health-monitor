@@ -12,7 +12,14 @@ export const healthApi = {
   getMenstrual: () => api.get('/menstrual'),
   
   // 获取预测数据
-  getPrediction: () => api.get('/prediction'),
+  async getPrediction() {
+    // 模拟 API 返回数据
+    return {
+      heartRate: '75',
+      temperature: '36.5',
+      nextCycle: '2023-11-01'
+    };
+  },
   
   // 保存心情数据
   saveMood: (moodData) => api.post('/mood', moodData),
