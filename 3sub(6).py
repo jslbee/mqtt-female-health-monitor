@@ -6,7 +6,7 @@ from mysql.connector import Error
 import sys
 
 # MQTT 配置
-BROKER_ADDRESS = "broker.emqx.io"  # 使用公共MQTT代理
+BROKER_ADDRESS = "120.76.249.191"  # 使用公共MQTT代理
 BROKER_PORT = 1883
 
 # 数据库配置
