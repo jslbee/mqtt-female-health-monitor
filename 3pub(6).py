@@ -5,7 +5,7 @@ import random
 from datetime import datetime
 
 # MQTT Broker Configuration
-BROKER_ADDRESS = "broker.emqx.io"  # Public MQTT broker
+BROKER_ADDRESS = "120.76.249.191"  # Public MQTT broker
 BROKER_PORT = 1883
 
 # Temperature Threshold Configuration
