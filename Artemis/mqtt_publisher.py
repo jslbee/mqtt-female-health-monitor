@@ -97,11 +97,11 @@ def check_menstrual_cycle(duration):
 def generate_health_status(heart_rate):
     """Generate health status based on heart rate"""
     if heart_rate < 60:
-        return "偏低"
+        return "Too low"
     elif heart_rate > 100:
-        return "偏高"
+        return "Too high"
     else:
-        return "正常"
+        return "Normal"
 
 # Callback function when data is published
 def on_publish(client, userdata, mid):
@@ -126,13 +126,13 @@ def publisher():
             condition = check_menstrual_cycle(duration)
             menstrual_data = {
                 "duration": duration,
-                "condition": condition
+                "condition1": condition
             }
             menstrual_payload = json.dumps(menstrual_data)
             
             # Publish menstrual data to MQTT topic
             client.publish("health/userinput/menstrual_cycle", menstrual_payload, qos=1)
-            print(f"经期数据已发布: {menstrual_payload}")
+            print(f"Menstrual data published: {menstrual_payload}")
             
             # 2. Generate heart rate data
             heart_rate = round(random.uniform(50, 120), 2)
@@ -147,7 +147,7 @@ def publisher():
             
             # Publish heart rate data to MQTT topic
             client.publish("health/wearable/heart_rate", heart_rate_payload, qos=1)
-            print(f"[{timestamp}] 心率数据已发布: {heart_rate_payload}")
+            print(f"[{timestamp}] Heart rate data published: {heart_rate_payload}")
             
             # 3. Generate temperature data
             temp_data = temp_generator.generate_temperature()
@@ -155,17 +155,17 @@ def publisher():
             
             # Publish temperature data to MQTT topic
             client.publish("health/wearable/temperature", temp_payload, qos=1)
-            print(f"温度数据已发布: {temp_payload}")
+            print(f"Temperature data published: {temp_payload}")
             
             # Send data again after 30 seconds
             time.sleep(30)
     
     except KeyboardInterrupt:
-        print("\n程序已停止")
+        print("\nProgram stopped")
         client.loop_stop()
         client.disconnect()
     except Exception as e:
-        print(f"发生错误: {e}")
+        print(f"Error occurred: {e}")
         client.loop_stop()
         client.disconnect()
 

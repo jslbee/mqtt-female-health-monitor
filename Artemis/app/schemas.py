@@ -2,38 +2,32 @@ from pydantic import BaseModel
 from datetime import datetime
 
 # 温度数据响应模型
-class TemperatureResponse(BaseModel):
+class TemperatureCreate(BaseModel):
     id: int
     timestamp: datetime
     temperature: float
+    warning: str | None = None  # 新增字段
+    trend: str | None = None    # 新增字段
 
     class Config:
         orm_mode = True
 
 # 心率数据响应模型
-class HeartrateResponse(BaseModel):
+class HeartRateCreate(BaseModel):
     id: int
     timestamp: datetime
-    heartrate: float
+    heart_rate: float
+    health_status: str
 
     class Config:
         orm_mode = True
 
 # 经期数据响应模型
-class MenstrualResponse(BaseModel):
+class MenstrualCreate(BaseModel):
     id: int
-    start_date: datetime
-    end_date: datetime
-    notes: str
-
-    class Config:
-        orm_mode = True
-
-# 预测数据响应模型
-class PredictionResponse(BaseModel):
-    prediction_id: int
-    prediction_date: datetime
-    result: str
+    timestamp: datetime  # 修改为 timestamp
+    duration: float      # 修改为 duration
+    condition: str       # 修改为 condition，保持一致
 
     class Config:
         orm_mode = True
