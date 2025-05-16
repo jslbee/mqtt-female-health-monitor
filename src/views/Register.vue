@@ -3,21 +3,21 @@
     <NavBar />
     <div class="register-container">
       <div class="register-card">
-        <h2 class="register-title">注册新账号</h2>
+        <h2 class="register-title">Create New Account</h2>
         <form @submit.prevent="handleRegister">
           <div class="form-group">
-            <label for="username">用户名</label>
+            <label for="username">Username</label>
             <input type="text" id="username" v-model="username" required />
           </div>
           <div class="form-group">
-            <label for="password">密码</label>
+            <label for="password">Password</label>
             <input type="password" id="password" v-model="password" required />
           </div>
           <div class="button-container">
-            <button class="female-button" type="submit">注册</button>
+            <button class="female-button" type="submit">Register</button>
           </div>
           <div class="login-link">
-            已有账号？<a @click.prevent="goToLogin" href="#">去登录</a>
+            Already have an account? <a @click.prevent="goToLogin" href="#">Sign in</a>
           </div>
         </form>
       </div>
@@ -41,21 +41,21 @@ export default {
   },
   methods: {
     async handleRegister() {
-      alert('点击了注册');
+      alert('Register clicked');
       if (!this.username || !this.password) {
-        alert('请输入用户名和密码');
+        alert('Please enter username and password');
         return;
       }
       this.loading = true;
       try {
         await registerApi(this.username, this.password);
-        alert('注册成功，请登录');
+        alert('Registration successful, please sign in');
         this.$router.push('/login');
       } catch (err) {
         if (err.response && err.response.data && err.response.data.detail) {
-          alert('注册失败：' + err.response.data.detail);
+          alert('Registration failed: ' + err.response.data.detail);
         } else {
-          alert('注册失败，请重试');
+          alert('Registration failed, please try again');
         }
       } finally {
         this.loading = false;

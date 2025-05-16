@@ -4,30 +4,30 @@
     <div class="login-container">
       <div class="login-card">
         <div class="login-header">
-          <h2 class="login-title">欢迎回来</h2>
-          <p class="login-subtitle">登录你的健康监测账号</p>
+          <h2 class="login-title">Welcome Back</h2>
+          <p class="login-subtitle">Sign in to your health monitoring account</p>
         </div>
         <form @submit.prevent="handleLogin">
           <div class="form-group">
-            <label for="username">用户名</label>
-            <input type="text" id="username" v-model="username" placeholder="请输入用户名" required />
+            <label for="username">Username</label>
+            <input type="text" id="username" v-model="username" placeholder="Please enter your username" required />
           </div>
           <div class="form-group">
-            <label for="password">密码</label>
-            <input type="password" id="password" v-model="password" placeholder="请输入密码" required />
+            <label for="password">Password</label>
+            <input type="password" id="password" v-model="password" placeholder="Please enter your password" required />
           </div>
           <div class="remember-forgot">
             <label class="remember-me">
               <input type="checkbox" v-model="rememberMe" />
-              <span>记住我</span>
+              <span>Remember me</span>
             </label>
-            <a href="#" class="forgot-password">忘记密码？</a>
+            <a href="#" class="forgot-password">Forgot password?</a>
           </div>
           <div class="button-container">
-            <button class="female-button" type="submit">登录</button>
+            <button class="female-button" type="submit">Sign In</button>
           </div>
           <div class="register-link">
-            没有账号？<a href="#">立即注册</a>
+            Don't have an account? <a @click.prevent="$router.push('/register')" href="#">Register now</a>
           </div>
         </form>
       </div>
@@ -37,6 +37,7 @@
 
 <script>
 import NavBar from '../components/NavBar.vue'
+import { loginApi } from '@/api'
 
 export default {
   name: 'Login',
@@ -45,17 +46,28 @@ export default {
     return {
       username: '',
       password: '',
-      rememberMe: false
+      rememberMe: false,
+      loading: false
     }
   },
   methods: {
-    handleLogin() {
-      // 简单模拟登录逻辑
-      if (this.username && this.password) {
-        localStorage.setItem('isLoggedIn', 'true')
-        this.$router.push('/metrics')
-      } else {
-        alert('请输入用户名和密码')
+    async handleLogin() {
+      alert('Login clicked');
+      if (!this.username || !this.password) {
+        alert('Please enter username and password');
+        return;
+      }
+      this.loading = true;
+      try {
+        const res = await loginApi(this.username, this.password);
+        const token = res.data.access_token;
+        localStorage.setItem('token', token);
+        localStorage.setItem('isLoggedIn', 'true');
+        this.$router.push('/metrics');
+      } catch (err) {
+        alert('Login failed, please check your username and password');
+      } finally {
+        this.loading = false;
       }
     }
   }

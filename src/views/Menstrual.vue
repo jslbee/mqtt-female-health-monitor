@@ -6,7 +6,7 @@
         <h2 class="header-title"><i class="ri-calendar-event-line"></i>Menstrual Data</h2>
         <p class="header-subtitle">Track your menstrual cycle to understand your physiological condition and health status.</p>
       </div>
-      <!-- 经期摘要 -->
+      <!-- Menstrual Summary -->
       <div class="cycle-summary">
         <div class="cycle-stat">
           <div class="stat-number">28</div>
@@ -25,11 +25,11 @@
           <div class="stat-title">Days Until Next Period</div>
         </div>
       </div>
-      <!-- 经期图表 -->
+      <!-- Menstrual Chart -->
       <div class="chart-container">
         <canvas ref="menstrualChart"></canvas>
       </div>
-      <!-- 日历视图 -->
+      <!-- Calendar View -->
       <div class="calendar-section">
         <h3 class="section-title"><i class="ri-calendar-line"></i>Cycle Calendar</h3>
         <div class="calendar-header">
@@ -91,7 +91,7 @@
           <div class="calendar-day empty"></div>
         </div>
       </div>
-      <!-- 健康建议 -->
+      <!-- Health Tips -->
       <div class="tips-section">
         <h3 class="section-title"><i class="ri-heart-3-line"></i>Menstrual Health Tips</h3>
         <div class="tips-grid">
