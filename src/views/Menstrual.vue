@@ -6,6 +6,15 @@
         <h2 class="header-title"><i class="ri-calendar-event-line"></i>Menstrual Data</h2>
         <p class="header-subtitle">Track your menstrual cycle to understand your physiological condition and health status.</p>
       </div>
+      <!-- 经期历史数据展示 -->
+      <div class="menstrual-list">
+        <h3>Recent Menstrual Records</h3>
+        <ul>
+          <li v-for="item in menstrualList" :key="item.id">
+            Date: {{ formatDate(item.timestamp) }} | Duration: {{ item.duration }} days | Condition: {{ item.condition }}
+          </li>
+        </ul>
+      </div>
       <!-- Menstrual Summary -->
       <div class="cycle-summary">
         <div class="cycle-stat">
@@ -125,55 +134,77 @@
 import { ref, onMounted } from 'vue'
 import NavBar from '../components/NavBar.vue'
 import Chart from 'chart.js/auto'
+import axios from 'axios'
 
 export default {
   name: 'Menstrual',
   components: { NavBar },
   setup() {
     const menstrualChart = ref(null)
-    onMounted(() => {
-      const ctx = menstrualChart.value.getContext('2d')
-      new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: ['Cycle 1', 'Cycle 2', 'Cycle 3', 'Cycle 4'],
-          datasets: [
-            {
-              label: 'Period Days',
-              data: [5, 6, 5, 7],
-              backgroundColor: '#E57C9F',
-              borderColor: '#E57C9F',
-              borderWidth: 1
-            },
-            {
-              label: 'Cycle Length',
-              data: [28, 29, 27, 30],
-              backgroundColor: 'rgba(229, 124, 159, 0.3)',
-              borderColor: '#E57C9F',
-              borderWidth: 1
-            }
-          ]
-        },
-        options: {
-          responsive: true,
-          plugins: {
-            legend: { position: 'top', labels: { color: '#4A2C40' } }
+    const menstrualList = ref([])
+    let chartInstance = null
+
+    // 日期格式化函数
+    function formatDate(dateStr) {
+      if (!dateStr) return ''
+      const d = new Date(dateStr)
+      return d.toLocaleDateString()
+    }
+
+    // 获取经期数据并动态生成图表
+    onMounted(async () => {
+      try {
+        const res = await axios.get('http://120.76.249.191:8080/menstrual')
+        menstrualList.value = res.data
+
+        // 生成 labels 和 period days
+        const labels = res.data.map((item, idx) => `Cycle ${res.data.length - idx}`)
+        const periodDays = res.data.map(item => item.duration)
+
+        // 销毁旧图表（如果有）
+        if (chartInstance) {
+          chartInstance.destroy()
+        }
+        // 初始化新图表
+        const ctx = menstrualChart.value.getContext('2d')
+        chartInstance = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: labels.reverse(), // 最新的在右侧
+            datasets: [
+              {
+                label: 'Period Days',
+                data: periodDays.reverse(),
+                backgroundColor: '#E57C9F',
+                borderColor: '#E57C9F',
+                borderWidth: 1
+              }
+            ]
           },
-          scales: {
-            y: {
-              beginAtZero: true,
-              grid: { color: 'rgba(74, 44, 64, 0.1)' },
-              ticks: { color: '#4A2C40' }
+          options: {
+            responsive: true,
+            plugins: {
+              legend: { position: 'top', labels: { color: '#4A2C40' } }
             },
-            x: {
-              grid: { color: 'rgba(74, 44, 64, 0.1)' },
-              ticks: { color: '#4A2C40' }
+            scales: {
+              y: {
+                beginAtZero: true,
+                grid: { color: 'rgba(74, 44, 64, 0.1)' },
+                ticks: { color: '#4A2C40' }
+              },
+              x: {
+                grid: { color: 'rgba(74, 44, 64, 0.1)' },
+                ticks: { color: '#4A2C40' }
+              }
             }
           }
-        }
-      })
+        })
+      } catch (e) {
+        console.error('Failed to fetch menstrual data:', e)
+      }
     })
-    return { menstrualChart }
+
+    return { menstrualChart, menstrualList, formatDate }
   }
 }
 </script>
@@ -185,6 +216,9 @@ export default {
 .header-title { color: #4A2C40; font-size: 32px; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 10px; }
 .header-title i { color: #E57C9F; }
 .header-subtitle { color: #666; font-size: 16px; max-width: 700px; margin: 0 auto; }
+.menstrual-list { margin: 30px 0; }
+.menstrual-list ul { list-style: none; padding: 0; }
+.menstrual-list li { background: #fff5f7; margin-bottom: 8px; padding: 10px 16px; border-radius: 8px; color: #4A2C40; }
 .cycle-summary { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 15px; margin-bottom: 25px; }
 .cycle-stat { background-color: rgba(229, 124, 159, 0.05); border-radius: 15px; padding: 15px; text-align: center; transition: all 0.3s ease; }
 .cycle-stat:hover { background-color: rgba(229, 124, 159, 0.1); transform: translateY(-3px); }
