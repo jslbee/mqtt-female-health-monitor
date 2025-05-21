@@ -11,6 +11,7 @@
         <div ref="chartRef" style="width: 100%; height: 340px;"></div>
       </div>
     </FemalCard>
+
     <div class="stats-row">
       <FemalCard variant="soft" class="stat-card">
         <div class="stat-icon stat-icon-main"><i class="ri-thermometer-line"></i></div>
@@ -28,6 +29,28 @@
           <div class="stat-value">{{ stats.max }} <span>°C</span></div>
       </FemalCard>
     </div>
+
+    <!-- 体温历史数据展示 - 卡片 -->
+    <div class="temperature-cards">
+      <h3>Recent Temperature Records (Cards)</h3>
+      <el-row :gutter="20">
+        <el-col :span="12" v-for="item in temperatureList" :key="item.timestamp">
+          <el-card class="temperature-card">
+            <div class="card-title">
+              <i class="ri-thermometer-line"></i>
+              {{ new Date(item.timestamp).toLocaleString() }}
+            </div>
+            <div class="card-content">
+              体温：<span class="highlight">{{ item.temperature }} °C</span>
+              <span v-if="getHealthStatus(item.temperature) !== 'Normal'" :class="['warning-indicator', getHealthStatus(item.temperature).toLowerCase().replace(' ', '-')]">
+                 ⚠️ {{ getHealthStatus(item.temperature) }}
+              </span>
+            </div>
+          </el-card>
+        </el-col>
+      </el-row>
+    </div>
+
     <FemalCard v-if="latestWarning" variant="soft">
       <div class="warning-container">
         <div class="warning-icon">⚠️</div>
@@ -55,6 +78,7 @@ export default {
     const latestWarning = ref('');
     const latest = ref({ value: 0, status: 'Normal' });
     const stats = ref({ average: 0, min: 0, max: 0 });
+    const temperatureList = ref([]); // 新增，用于存储历史数据列表
 
     // Health status determination
     const getHealthStatus = (temp) => {
@@ -126,6 +150,7 @@ export default {
         const token = localStorage.getItem('token');
         const response = await healthApi.getTemperature();
         const data = response.data;
+        temperatureList.value = data; // 将数据赋给历史记录列表
         const chartData = data.map(item => [item.timestamp, item.temperature]);
         if (data && data.length > 0) {
           const last = data[data.length - 1];
@@ -150,6 +175,8 @@ export default {
         chart.setOption({ series: [{ data: chartData }] });
       } catch (error) {
         console.error('Failed to get temperature data:', error);
+      } finally {
+        // 可以选择在这里停止 loading state 如果有的话
       }
     };
 
@@ -167,7 +194,8 @@ export default {
       if (chart) chart.dispose();
       if (timer) clearInterval(timer);
     });
-    return { chartRef, latestWarning, latest, healthStatusTip, statusColor, goBack, stats };
+
+    return { chartRef, latestWarning, latest, healthStatusTip, statusColor, goBack, stats, temperatureList, getHealthStatus }; // 导出 temperatureList 和 getHealthStatus
   }
 };
 </script>
@@ -205,6 +233,7 @@ export default {
 .status-text {
   font-weight: 600;
 }
+
 .stats-row {
   display: flex;
   gap: 18px;
@@ -226,7 +255,7 @@ export default {
   margin-bottom: 8px;
 }
 .stat-icon-main {
-  color: #7EB8A2;
+  color: #7EB8A2; /* 使用更匹配的颜色 */
 }
 .stat-icon-low {
   color: #1890ff;
@@ -250,6 +279,59 @@ export default {
   color: #AE5F87;
   font-weight: 400;
 }
+
+.temperature-cards {
+  margin-top: 30px; /* 调整位置到统计数据下方 */
+}
+temperature-cards h3 {
+  color: #4A2C40;
+  margin-bottom: 15px;
+}
+.temperature-card {
+  margin-bottom: 20px;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(126, 184, 162, 0.08); /* 使用更匹配的颜色 */
+  border: none;
+  transition: box-shadow 0.3s;
+}
+.temperature-card:hover {
+  box-shadow: 0 8px 32px rgba(126, 184, 162, 0.15);
+}
+.card-title {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #7EB8A2; /* 使用更匹配的颜色 */
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.card-content {
+  color: #4A2C40;
+  font-size: 1rem;
+  line-height: 1.8;
+  display: flex; /* 使用 flexbox 布局 */
+  justify-content: space-between; /* 将体温值和警告提示分开 */
+  align-items: center;
+}
+.highlight {
+  color: #5A9B82; /* 使用更匹配的颜色 */
+  font-weight: 600;
+}
+.warning-indicator {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+.warning-indicator.high,
+.warning-indicator.low-fever,
+.warning-indicator.high-fever {
+  color: #E86B6B; /* 高体温和发烧使用红色 */
+}
+.warning-indicator.low,
+.warning-indicator.hypothermia {
+  color: #1890ff; /* 低体温使用蓝色 */
+}
+
 .warning-container {
   display: flex;
   align-items: center;

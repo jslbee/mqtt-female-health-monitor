@@ -1,20 +1,17 @@
 <template>
   <div>
-    <NavBar />
+    <button class="back-btn" @click="goBack">返回首页</button>
     <div class="container">
       <div class="header">
         <h2 class="header-title"><i class="ri-calendar-event-line"></i>Menstrual Data</h2>
         <p class="header-subtitle">Track your menstrual cycle to understand your physiological condition and health status.</p>
       </div>
-      <!-- 经期历史数据展示 -->
-      <div class="menstrual-list">
-        <h3>Recent Menstrual Records</h3>
-        <ul>
-          <li v-for="item in menstrualList" :key="item.id">
-            Date: {{ formatDate(item.timestamp) }} | Duration: {{ item.duration }} days | Condition: {{ item.condition }}
-          </li>
-        </ul>
+
+      <!-- Menstrual Chart -->
+      <div class="chart-container">
+        <canvas ref="menstrualChart"></canvas>
       </div>
+
       <!-- Menstrual Summary -->
       <div class="cycle-summary">
         <div class="cycle-stat">
@@ -34,72 +31,17 @@
           <div class="stat-title">Days Until Next Period</div>
         </div>
       </div>
-      <!-- Menstrual Chart -->
-      <div class="chart-container">
-        <canvas ref="menstrualChart"></canvas>
+
+      <!-- 经期历史数据展示 - 列表 -->
+      <div class="menstrual-list">
+        <h3>Recent Menstrual Records (List)</h3>
+        <ul>
+          <li v-for="item in menstrualList" :key="item.id">
+            Date: {{ formatDate(item.timestamp) }} | Duration: {{ item.duration }} days | Condition: {{ item.condition }}
+          </li>
+        </ul>
       </div>
-      <!-- Calendar View -->
-      <div class="calendar-section">
-        <h3 class="section-title"><i class="ri-calendar-line"></i>Cycle Calendar</h3>
-        <div class="calendar-header">
-          <div class="calendar-month">October 2023</div>
-          <div class="calendar-controls">
-            <button class="calendar-button"><i class="ri-arrow-left-s-line"></i></button>
-            <button class="calendar-button"><i class="ri-arrow-right-s-line"></i></button>
-          </div>
-        </div>
-        <div class="calendar-grid">
-          <div class="calendar-day-header">Sun</div>
-          <div class="calendar-day-header">Mon</div>
-          <div class="calendar-day-header">Tue</div>
-          <div class="calendar-day-header">Wed</div>
-          <div class="calendar-day-header">Thu</div>
-          <div class="calendar-day-header">Fri</div>
-          <div class="calendar-day-header">Sat</div>
-          <div class="calendar-day empty"></div>
-          <div class="calendar-day empty"></div>
-          <div class="calendar-day empty"></div>
-          <div class="calendar-day empty"></div>
-          <div class="calendar-day empty"></div>
-          <div class="calendar-day">1</div>
-          <div class="calendar-day">2</div>
-          <div class="calendar-day">3</div>
-          <div class="calendar-day">4</div>
-          <div class="calendar-day period">5</div>
-          <div class="calendar-day period">6</div>
-          <div class="calendar-day period">7</div>
-          <div class="calendar-day period">8</div>
-          <div class="calendar-day period">9</div>
-          <div class="calendar-day">10</div>
-          <div class="calendar-day">11</div>
-          <div class="calendar-day">12</div>
-          <div class="calendar-day">13</div>
-          <div class="calendar-day fertile">14</div>
-          <div class="calendar-day fertile">15</div>
-          <div class="calendar-day fertile">16</div>
-          <div class="calendar-day fertile">17</div>
-          <div class="calendar-day ovulation">18</div>
-          <div class="calendar-day fertile">19</div>
-          <div class="calendar-day fertile">20</div>
-          <div class="calendar-day today">21</div>
-          <div class="calendar-day">22</div>
-          <div class="calendar-day">23</div>
-          <div class="calendar-day">24</div>
-          <div class="calendar-day">25</div>
-          <div class="calendar-day">26</div>
-          <div class="calendar-day">27</div>
-          <div class="calendar-day">28</div>
-          <div class="calendar-day">29</div>
-          <div class="calendar-day">30</div>
-          <div class="calendar-day">31</div>
-          <div class="calendar-day empty"></div>
-          <div class="calendar-day empty"></div>
-          <div class="calendar-day empty"></div>
-          <div class="calendar-day empty"></div>
-          <div class="calendar-day empty"></div>
-          <div class="calendar-day empty"></div>
-        </div>
-      </div>
+
       <!-- Health Tips -->
       <div class="tips-section">
         <h3 class="section-title"><i class="ri-heart-3-line"></i>Menstrual Health Tips</h3>
@@ -135,6 +77,7 @@ import { ref, onMounted } from 'vue'
 import NavBar from '../components/NavBar.vue'
 import Chart from 'chart.js/auto'
 import axios from 'axios'
+import { useRouter } from 'vue-router'
 
 export default {
   name: 'Menstrual',
@@ -143,6 +86,7 @@ export default {
     const menstrualChart = ref(null)
     const menstrualList = ref([])
     let chartInstance = null
+    const router = useRouter()
 
     // 日期格式化函数
     function formatDate(dateStr) {
@@ -154,7 +98,7 @@ export default {
     // 获取经期数据并动态生成图表
     onMounted(async () => {
       try {
-        const res = await axios.get('http://120.76.249.191:8080/menstrual')
+        const res = await axios.get('http://120.76.249.191:8000/menstrual')
         menstrualList.value = res.data
 
         // 生成 labels 和 period days
@@ -204,8 +148,18 @@ export default {
       }
     })
 
-    return { menstrualChart, menstrualList, formatDate }
-  }
+    // 返回首页方法
+    const goBack = () => {
+      router.push('/metrics')
+    }
+
+    return {
+      menstrualChart,
+      menstrualList,
+      formatDate,
+      goBack,
+    }
+  },
 }
 </script>
 
@@ -216,32 +170,21 @@ export default {
 .header-title { color: #4A2C40; font-size: 32px; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 10px; }
 .header-title i { color: #E57C9F; }
 .header-subtitle { color: #666; font-size: 16px; max-width: 700px; margin: 0 auto; }
+
 .menstrual-list { margin: 30px 0; }
+.menstrual-list h3 { color: #4A2C40; margin-bottom: 15px; }
 .menstrual-list ul { list-style: none; padding: 0; }
 .menstrual-list li { background: #fff5f7; margin-bottom: 8px; padding: 10px 16px; border-radius: 8px; color: #4A2C40; }
+
 .cycle-summary { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 15px; margin-bottom: 25px; }
 .cycle-stat { background-color: rgba(229, 124, 159, 0.05); border-radius: 15px; padding: 15px; text-align: center; transition: all 0.3s ease; }
 .cycle-stat:hover { background-color: rgba(229, 124, 159, 0.1); transform: translateY(-3px); }
 .stat-number { font-size: 28px; font-weight: bold; color: #E57C9F; margin-bottom: 5px; }
 .stat-title { font-size: 14px; color: #4A2C40; }
-.chart-container { background-color: white; border-radius: 20px; padding: 30px; margin: 20px auto; box-shadow: 0 4px 20px rgba(156, 91, 128, 0.12); }
-.calendar-section { margin-top: 30px; background-color: white; border-radius: 20px; padding: 30px; box-shadow: 0 4px 20px rgba(156, 91, 128, 0.12); }
-.section-title { color: #4A2C40; font-size: 22px; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
-.section-title i { color: #E57C9F; }
-.calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-.calendar-month { font-size: 18px; font-weight: bold; color: #4A2C40; }
-.calendar-controls { display: flex; gap: 10px; }
-.calendar-button { background-color: rgba(229, 124, 159, 0.1); color: #4A2C40; border: none; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s ease; }
-.calendar-button:hover { background-color: #E57C9F; color: white; }
-.calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
-.calendar-day-header { text-align: center; font-weight: bold; padding: 5px; color: #4A2C40; }
-.calendar-day { aspect-ratio: 1; background-color: white; border-radius: 10px; display: flex; align-items: center; justify-content: center; border-radius: 10px; font-size: 14px; background-color: rgba(229, 124, 159, 0.05); color: #4A2C40; position: relative; transition: all 0.3s ease; }
-.calendar-day:hover { background-color: rgba(229, 124, 159, 0.1); transform: scale(1.05); }
-.calendar-day.period { background-color: rgba(229, 124, 159, 0.3); color: #4A2C40; font-weight: bold; }
-.calendar-day.fertile { background-color: rgba(126, 184, 162, 0.2); color: #4A2C40; }
-.calendar-day.ovulation { background-color: rgba(126, 184, 162, 0.4); color: #4A2C40; font-weight: bold; }
-.calendar-day.today { border: 2px solid #E57C9F; }
-.calendar-day.empty { background-color: transparent; }
+
+.chart-container { background-color: white; border-radius: 20px; padding: 30px; margin: 20px auto; box-shadow: 0 4px 20px rgba(156, 91, 128, 0.12); text-align: center; /* 确保内容居中 */ }
+canvas { display: inline-block; /* 让 canvas 元素可以被 text-align 居中 */ max-width: 100%; height: auto; }
+
 .tips-section { margin-top: 30px; background-color: white; border-radius: 20px; padding: 30px; box-shadow: 0 4px 20px rgba(156, 91, 128, 0.12); }
 .tips-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; margin-top: 20px; }
 .tip-card { background-color: rgba(229, 124, 159, 0.05); border-radius: 15px; padding: 15px; transition: all 0.3s ease; }
@@ -249,4 +192,18 @@ export default {
 .tip-icon { font-size: 24px; color: #E57C9F; margin-bottom: 10px; }
 .tip-title { font-size: 16px; font-weight: bold; color: #4A2C40; margin-bottom: 10px; }
 .tip-content { font-size: 14px; color: #666; line-height: 1.5; }
+
+.back-btn {
+  margin: 20px 0 0 20px;
+  padding: 6px 18px;
+  background: #E57C9F;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 15px;
+}
+.back-btn:hover {
+  background: #d66a8d;
+}
 </style> 

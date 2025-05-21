@@ -11,6 +11,7 @@
         <div ref="chartRef" style="width: 100%; height: 340px;"></div>
       </div>
     </FemalCard>
+
     <div class="stats-row">
       <FemalCard variant="soft" class="stat-card">
         <div class="stat-icon stat-icon-main"><i class="ri-heart-pulse-line"></i></div>
@@ -28,6 +29,28 @@
         <div class="stat-value">{{ stats.max }} <span>BPM</span></div>
       </FemalCard>
       </div>
+
+    <!-- 心率历史数据展示 - 卡片 -->
+    <div class="heart-rate-cards">
+      <h3>Recent Heart Rate Records (Cards)</h3>
+      <el-row :gutter="20">
+        <el-col :span="12" v-for="item in heartRateList" :key="item.timestamp">
+          <el-card class="heart-rate-card">
+            <div class="card-title">
+              <i class="ri-heart-pulse-line"></i>
+              {{ new Date(item.timestamp).toLocaleString() }}
+            </div>
+            <div class="card-content">
+              心率：<span class="highlight">{{ item.heart_rate }} BPM</span>
+              <span v-if="getHealthStatus(item.heart_rate) !== 'Normal'" :class="['warning-indicator', getHealthStatus(item.heart_rate).toLowerCase()]">
+                 ⚠️ {{ getHealthStatus(item.heart_rate) }}
+              </span>
+            </div>
+          </el-card>
+        </el-col>
+      </el-row>
+    </div>
+
     </div>
   </div>
 </template>
@@ -48,6 +71,7 @@ export default {
     let timer = null;
     const stats = ref({ average: 0, min: 0, max: 0 });
     const latest = ref({ value: 0, status: 'Normal' });
+    const heartRateList = ref([]); // 新增，用于存储历史数据列表
 
     // Health status determination
     const getHealthStatus = (hr) => {
@@ -112,6 +136,7 @@ export default {
         const token = localStorage.getItem('token');
         const response = await healthApi.getHeartRate();
         const data = response.data;
+        heartRateList.value = data; // 将数据赋给历史记录列表
         const chartData = data.map(item => [item.timestamp, item.heart_rate]);
         if (data && data.length > 0) {
           const last = data[data.length - 1];
@@ -152,7 +177,8 @@ export default {
       if (chart) chart.dispose();
       if (timer) clearInterval(timer);
     });
-    return { chartRef, stats, latest, healthStatusTip, statusColor, goBack };
+    // 导出 getHealthStatus 方法供模板使用
+    return { chartRef, stats, latest, healthStatusTip, statusColor, goBack, heartRateList, getHealthStatus };
   }
 };
 </script>
@@ -190,6 +216,7 @@ export default {
 .status-text {
   font-weight: 600;
 }
+
 .stats-row {
   display: flex;
   gap: 18px;
@@ -235,6 +262,56 @@ export default {
   color: #AE5F87;
   font-weight: 400;
 }
+
+.heart-rate-cards {
+  margin-top: 30px; /* 调整位置到统计数据下方 */
+}
+.heart-rate-cards h3 {
+  color: #4A2C40;
+  margin-bottom: 15px;
+}
+.heart-rate-card {
+  margin-bottom: 20px;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(229, 124, 159, 0.08);
+  border: none;
+  transition: box-shadow 0.3s;
+}
+.heart-rate-card:hover {
+  box-shadow: 0 8px 32px rgba(229, 124, 159, 0.15);
+}
+.card-title {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #E57C9F;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.card-content {
+  color: #4A2C40;
+  font-size: 1rem;
+  line-height: 1.8;
+  display: flex; /* 使用 flexbox 布局 */
+  justify-content: space-between; /* 将心率值和警告提示分开 */
+  align-items: center;
+}
+.highlight {
+  color: #C45D7D;
+  font-weight: 600;
+}
+.warning-indicator {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+.warning-indicator.high {
+  color: #E86B6B; /* 高心率使用红色 */
+}
+.warning-indicator.low {
+  color: #1890ff; /* 低心率使用蓝色 */
+}
+
 @media (max-width: 700px) {
   .stats-row {
     flex-direction: column;
