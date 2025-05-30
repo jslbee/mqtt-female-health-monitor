@@ -41,7 +41,7 @@
               {{ new Date(item.timestamp).toLocaleString() }}
             </div>
             <div class="card-content">
-              体温：<span class="highlight">{{ item.temperature }} °C</span>
+              Temperature: <span class="highlight">{{ item.temperature }} °C</span>
               <span v-if="getHealthStatus(item.temperature) !== 'Normal'" :class="['warning-indicator', getHealthStatus(item.temperature).toLowerCase().replace(' ', '-')]">
                  ⚠️ {{ getHealthStatus(item.temperature) }}
               </span>
@@ -205,6 +205,9 @@ export default {
   max-width: 900px;
   margin: 0 auto;
   padding: 32px 0 24px 0;
+  background: linear-gradient(135deg, #fff 0%, #F5FAF7 100%);
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(126, 184, 162, 0.12);
 }
 .chart-section {
   padding-bottom: 0;
@@ -223,12 +226,15 @@ export default {
 }
 .status-normal {
   color: #7EB8A2;
+  text-shadow: 0 2px 4px rgba(126, 184, 162, 0.2);
 }
 .status-high {
   color: #E86B6B;
+  text-shadow: 0 2px 4px rgba(232, 107, 107, 0.2);
 }
 .status-low {
   color: #1890ff;
+  text-shadow: 0 2px 4px rgba(24, 144, 255, 0.2);
 }
 .status-text {
   font-weight: 600;
@@ -249,6 +255,13 @@ export default {
   min-height: 140px;
   box-shadow: none;
   background: linear-gradient(135deg, #fff 70%, #F5FAF7 100%);
+  border: 1px solid rgba(126, 184, 162, 0.1);
+  transition: all 0.3s ease;
+}
+.stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(126, 184, 162, 0.15);
+  background: linear-gradient(135deg, #F5FAF7 0%, #fff 100%);
 }
 .stat-icon {
   font-size: 2.2rem;
@@ -290,12 +303,15 @@ temperature-cards h3 {
 .temperature-card {
   margin-bottom: 20px;
   border-radius: 16px;
-  box-shadow: 0 4px 16px rgba(126, 184, 162, 0.08); /* 使用更匹配的颜色 */
-  border: none;
-  transition: box-shadow 0.3s;
+  box-shadow: none;
+  transition: all 0.3s ease;
+  background: linear-gradient(135deg, #fff 0%, #F5FAF7 100%);
+  border: 1px solid rgba(126, 184, 162, 0.1);
 }
 .temperature-card:hover {
-  box-shadow: 0 8px 32px rgba(126, 184, 162, 0.15);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(126, 184, 162, 0.15);
+  background: linear-gradient(135deg, #F5FAF7 0%, #fff 100%);
 }
 .card-title {
   font-size: 1.1rem;
@@ -337,6 +353,12 @@ temperature-cards h3 {
   align-items: center;
   gap: 10px;
   padding: 10px 0;
+  background: linear-gradient(135deg, #FFF5F7 0%, #fff 100%);
+  border: 1px solid rgba(229, 124, 159, 0.1);
+  border-radius: 12px;
+  padding: 15px;
+  margin-top: 20px;
+  box-shadow: 0 4px 12px rgba(229, 124, 159, 0.1);
 }
 .warning-icon {
   font-size: 20px;
