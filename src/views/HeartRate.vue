@@ -41,7 +41,7 @@
               {{ new Date(item.timestamp).toLocaleString() }}
             </div>
             <div class="card-content">
-              心率：<span class="highlight">{{ item.heart_rate }} BPM</span>
+              Heart Rate: <span class="highlight">{{ item.heart_rate }} BPM</span>
               <span v-if="getHealthStatus(item.heart_rate) !== 'Normal'" :class="['warning-indicator', getHealthStatus(item.heart_rate).toLowerCase()]">
                  ⚠️ {{ getHealthStatus(item.heart_rate) }}
               </span>
@@ -188,6 +188,9 @@ export default {
   max-width: 900px;
   margin: 0 auto;
   padding: 32px 0 24px 0;
+  background: linear-gradient(135deg, #fff 0%, #FFF5F7 100%);
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(156, 91, 128, 0.12);
 }
 .chart-section {
   padding-bottom: 0;
@@ -206,12 +209,15 @@ export default {
 }
 .status-normal {
   color: #7EB8A2;
+  text-shadow: 0 2px 4px rgba(126, 184, 162, 0.2);
 }
 .status-high {
   color: #E86B6B;
+  text-shadow: 0 2px 4px rgba(232, 107, 107, 0.2);
 }
 .status-low {
   color: #1890ff;
+  text-shadow: 0 2px 4px rgba(24, 144, 255, 0.2);
 }
 .status-text {
   font-weight: 600;
@@ -232,6 +238,13 @@ export default {
   min-height: 140px;
   box-shadow: none;
   background: linear-gradient(135deg, #fff 70%, #FFF5F7 100%);
+  border: 1px solid rgba(229, 124, 159, 0.1);
+  transition: all 0.3s ease;
+}
+.stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(229, 124, 159, 0.15);
+  background: linear-gradient(135deg, #FFF5F7 0%, #fff 100%);
 }
 .stat-icon {
   font-size: 2.2rem;
@@ -276,9 +289,14 @@ export default {
   box-shadow: 0 4px 16px rgba(229, 124, 159, 0.08);
   border: none;
   transition: box-shadow 0.3s;
+  background: linear-gradient(135deg, #fff 0%, #FFF5F7 100%);
+  border: 1px solid rgba(229, 124, 159, 0.1);
+  transition: all 0.3s ease;
 }
 .heart-rate-card:hover {
-  box-shadow: 0 8px 32px rgba(229, 124, 159, 0.15);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(229, 124, 159, 0.15);
+  background: linear-gradient(135deg, #FFF5F7 0%, #fff 100%);
 }
 .card-title {
   font-size: 1.1rem;

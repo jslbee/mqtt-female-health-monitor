@@ -119,9 +119,13 @@ h1 {
 }
 
 @media (max-width: 1024px) {
+  .team-grid {
+  }
 }
 
 @media (max-width: 768px) {
+  .team-grid {
+  }
 }
 
 .member-card {

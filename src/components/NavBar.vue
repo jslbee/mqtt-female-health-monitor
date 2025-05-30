@@ -6,7 +6,7 @@
     <router-link to="/metrics" class="nav-item">Health Metrics</router-link>
     <router-link to="/prediction" class="nav-item">Prediction</router-link>
     <router-link to="/messages" class="nav-item">Messages</router-link>
-    <router-link to="/records" class="nav-item">Health Records</router-link>
+    <router-link to="/records" class="nav-item">Team Members</router-link>
   </nav>
 </template>
 

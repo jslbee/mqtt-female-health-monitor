@@ -30,8 +30,8 @@ const routes = [
   },
   {
     path: '/records',
-    name: 'HealthRecords',
-    component: () => import('../views/HealthRecords.vue')
+    name: 'TeamMembers',
+    component: () => import('../views/TeamMembers.vue')
   },
   {
     path: '/heart-rate',

@@ -3,8 +3,8 @@
     <NavBar />
     <div class="container">
       <div class="header">
-        <h1>AI 聊天助手</h1>
-        <p class="subtitle">和AI健康助手对话，获取健康建议或解答。</p>
+        <h1>AI Chat Assistant</h1>
+        <p class="subtitle">Chat with AI health assistant to get health advice or answers.</p>
       </div>
       <div class="chat-section" ref="chatSection">
         <div
@@ -13,7 +13,7 @@
           :class="['chat-row', msg.role]"
         >
           <div :class="['chat-bubble', msg.role]">
-            <span class="role">{{ msg.role === 'user' ? '我' : 'AI' }}</span>
+            <span class="role">{{ msg.role === 'user' ? 'Me' : 'AI' }}</span>
             <span class="content">{{ msg.content }}</span>
           </div>
         </div>
@@ -21,14 +21,14 @@
       <div class="input-section">
         <el-input
           v-model="userInput"
-          placeholder="请输入您的问题…"
+          placeholder="Please enter your question..."
           :autosize="{ minRows: 2, maxRows: 4 }"
           type="textarea"
           class="chat-input"
           @keyup.enter.native="sendMessage"
           :disabled="loading"
         />
-        <el-button type="primary" @click="sendMessage" :loading="loading" class="send-btn">发送</el-button>
+        <el-button type="primary" @click="sendMessage" :loading="loading" class="send-btn">Send</el-button>
       </div>
     </div>
   </div>
@@ -44,7 +44,7 @@ export default {
   components: { NavBar },
   setup() {
     const chatHistory = ref([
-      { role: 'ai', content: '您好，我是AI健康助手，有什么可以帮您？' }
+      { role: 'ai', content: 'Hello, I am your AI health assistant. How can I help you?' }
     ])
     const userInput = ref('')
     const loading = ref(false)
@@ -81,7 +81,7 @@ export default {
         }
         chatHistory.value.push({ role: 'ai', content: aiContent })
       } catch (e) {
-        chatHistory.value.push({ role: 'ai', content: 'AI服务暂时不可用，请稍后再试。' })
+        chatHistory.value.push({ role: 'ai', content: 'AI service is temporarily unavailable, please try again later.' })
       } finally {
         loading.value = false
         scrollToBottom()
@@ -97,7 +97,7 @@ export default {
 .bg-gradient {
   min-height: 100vh;
   width: 100vw;
-  background: linear-gradient(120deg, #f8e1f0 0%, #f6f7fb 100%);
+  background: linear-gradient(120deg, #f8e1f0 0%, #f6f7fb 50%, #e8f5f0 100%);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -112,9 +112,10 @@ export default {
   display: flex;
   flex-direction: column;
   height: 85vh;
-  background: #fff;
+  background: linear-gradient(135deg, #fff 0%, #FFF5F7 100%);
+  border: 1px solid rgba(229, 124, 159, 0.1);
+  box-shadow: 0 8px 32px rgba(156, 91, 128, 0.15);
   border-radius: 24px;
-  box-shadow: 0 8px 32px rgba(156,91,128,0.10);
 }
 .header {
   text-align: center;
@@ -160,16 +161,19 @@ export default {
   flex-direction: column;
 }
 .chat-bubble.user {
-  background: linear-gradient(135deg, #e57c9f 0%, #f8b6d6 100%);
+  background: linear-gradient(135deg, #E57C9F 0%, #f8b6d6 100%);
   color: #fff;
   align-items: flex-end;
   border-bottom-right-radius: 4px;
+  box-shadow: 0 4px 12px rgba(229, 124, 159, 0.2);
 }
 .chat-bubble.ai {
-  background: #f5f5f5;
+  background: linear-gradient(135deg, #f5f5f5 0%, #e8f5f0 100%);
   color: #4A2C40;
   align-items: flex-start;
   border-bottom-left-radius: 4px;
+  box-shadow: 0 4px 12px rgba(126, 184, 162, 0.1);
+  border: 1px solid rgba(126, 184, 162, 0.1);
 }
 .role {
   font-size: 13px;
@@ -189,10 +193,28 @@ export default {
   min-height: 48px;
   font-size: 16px;
 }
+.chat-input :deep(.el-textarea__inner) {
+  border: 1px solid rgba(229, 124, 159, 0.2);
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+.chat-input :deep(.el-textarea__inner:focus) {
+  border-color: #E57C9F;
+  box-shadow: 0 0 0 2px rgba(229, 124, 159, 0.1);
+}
 .send-btn {
   height: 48px;
   font-size: 16px;
   padding: 0 24px;
+  background: linear-gradient(135deg, #E57C9F 0%, #f8b6d6 100%);
+  border: none;
+  box-shadow: 0 4px 12px rgba(229, 124, 159, 0.2);
+  transition: all 0.3s ease;
+}
+.send-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(229, 124, 159, 0.3);
+  background: linear-gradient(135deg, #f8b6d6 0%, #E57C9F 100%);
 }
 .chat-bubble .content {
   display: block;

@@ -9,19 +9,19 @@
       <h3 class="summary-title">Health Data Summary</h3>
       <div class="summary-stats">
         <div class="stat-item">
-          <div class="stat-value">78</div>
+          <div class="stat-value">{{ healthStats.averageHeartRate }}</div>
           <div class="stat-label">Average Heart Rate (bpm)</div>
         </div>
         <div class="stat-item">
-          <div class="stat-value">36.5°</div>
+          <div class="stat-value">{{ healthStats.averageTemperature }}°</div>
           <div class="stat-label">Average Temperature</div>
         </div>
         <div class="stat-item">
-          <div class="stat-value">28</div>
+          <div class="stat-value">{{ healthStats.currentCycle }}</div>
           <div class="stat-label">Current Cycle (days)</div>
         </div>
         <div class="stat-item">
-          <div class="stat-value">5</div>
+          <div class="stat-value">{{ healthStats.daysUntilNextPeriod }}</div>
           <div class="stat-label">Days Until Next Period</div>
         </div>
       </div>
@@ -38,17 +38,17 @@
     </div>
     <!-- Health metrics display -->
     <div class="dashboard">
-      <router-link to="/heart-rate" class="female-card">
+      <router-link to="/heart-rate" class="female-card heart-rate-card">
         <div class="card-icon"><i class="ri-heart-pulse-line"></i></div>
         <h3>Heart Rate</h3>
         <p>View your heart rate data</p>
       </router-link>
-      <router-link to="/temperature" class="female-card">
+      <router-link to="/temperature" class="female-card temperature-card">
         <div class="card-icon"><i class="ri-temp-hot-line"></i></div>
         <h3>Temperature</h3>
         <p>View your temperature data</p>
       </router-link>
-      <router-link to="/menstrual" class="female-card">
+      <router-link to="/menstrual" class="female-card menstrual-card">
         <div class="card-icon"><i class="ri-calendar-event-line"></i></div>
         <h3>Menstrual</h3>
         <p>View your menstrual data</p>
@@ -64,7 +64,7 @@
           <p>Track your emotional changes to understand your physical and mental health status.</p>
         </div>
       </div>
-      <div class="mood-container">
+      <div class="mood-container" ref="moodSelection">
         <h3 class="section-title">Today's Mood</h3>
         <p class="section-subtitle">Record your current emotional state</p>
         <div class="mood-grid">
@@ -77,9 +77,41 @@
         </div>
         <div class="mood-submit">
           <button class="female-button" @click="saveMood">Save Mood</button>
+          <button class="female-button clear-button" @click="clearSelectedDate" v-if="selectedDateForMood">Clear Selection</button>
         </div>
       </div>
     </div>
+
+    <!-- Mood History Calendar Section -->
+    <div class="mood-calendar-section health-overview">
+      <h3 class="overview-title"><i class="ri-history-line"></i>Mood History Calendar</h3>
+      <div class="calendar-header-custom">
+         <button @click="moveCalendar('prevYear')">&lt;&lt;</button>
+         <button @click="moveCalendar('prevMonth')">&lt;</button>
+         <span>{{ currentMonthYear }}</span>
+         <button @click="moveCalendar('nextMonth')">&gt;</button>
+         <button @click="moveCalendar('nextYear')">&gt;&gt;</button>
+      </div>
+      <div class="calendar-container">
+        <CalendarView
+          :show-date="currentCalendarDate"
+          :items="calendarEvents"
+          class="theme-default holiday-us-traditional holiday-us-official"
+          @click-date="handleClickDate"
+          @click-item="handleClickItem"
+        >
+          <template #dayContent="{ day }">
+            <div class="day-content" :class="{ 'selected-date': isDateSelected(day.date) }">
+              <div class="day-number">{{ day.label }}</div>
+              <div class="mood-icons">
+                <i v-for="mood in getMoodsForDate(day.date)" :key="mood.id" :class="[mood.icon, mood.color]" :title="mood.label"></i>
+              </div>
+            </div>
+          </template>
+        </CalendarView>
+      </div>
+    </div>
+
     <!-- Health tips -->
     <div class="health-tips">
       <h3 class="tips-title">Health Tips</h3>
@@ -97,12 +129,19 @@
 
 <script>
 import NavBar from '../components/NavBar.vue'
+import { CalendarView } from 'vue-simple-calendar'
+
+import 'vue-simple-calendar/dist/vue-simple-calendar.css'
+import 'vue-simple-calendar/dist/css/default.css'
+import 'vue-simple-calendar/dist/css/holidays-us.css'
+
 export default {
   name: 'Dashboard',
-  components: { NavBar },
+  components: { NavBar, CalendarView },
   data() {
     return {
       selectedMood: null,
+      moodHistory: [],
       moods: [
         { id: 'happy', label: 'Happy', icon: 'ri-emotion-happy-line', color: 'mood-happy' },
         { id: 'sad', label: 'Sad', icon: 'ri-emotion-sad-line', color: 'mood-sad' },
@@ -113,7 +152,34 @@ export default {
         { id: 'badmood', label: 'Low', icon: 'ri-emotion-2-line', color: 'mood-badmood' },
         { id: 'relax', label: 'Relaxed', icon: 'ri-emotion-line', color: 'mood-relax' },
         { id: 'fun', label: 'Fun', icon: 'ri-emotion-laugh-line', color: 'mood-fun' }
-      ]
+      ],
+      healthStats: {
+        averageHeartRate: 78,
+        averageTemperature: 36.5,
+        currentCycle: 28,
+        daysUntilNextPeriod: 5
+      },
+      currentCalendarDate: new Date(),
+      selectedDateForMood: null,
+    }
+  },
+  computed: {
+    calendarEvents() {
+      return this.moodHistory.map(record => {
+        const mood = this.moods.find(m => m.id === record.mood);
+        return {
+          id: record.date + '_' + record.mood,
+          startDate: new Date(record.date),
+          endDate: new Date(record.date),
+          title: mood ? mood.label : record.mood,
+          classes: ['mood-event', `mood-${record.mood}`],
+          moodId: record.mood
+        };
+      });
+    },
+    currentMonthYear() {
+      const options = { year: 'numeric', month: 'long' };
+      return this.currentCalendarDate.toLocaleDateString(undefined, options);
     }
   },
   methods: {
@@ -125,18 +191,126 @@ export default {
         alert('Please select a mood first');
         return;
       }
-      const today = new Date().toISOString().split('T')[0];
+      const dateToSave = this.selectedDateForMood ? this.selectedDateForMood : new Date().toISOString().split('T')[0];
+
       const moodData = {
-        date: today,
+        date: dateToSave,
         mood: this.selectedMood
       };
       let moodHistory = JSON.parse(localStorage.getItem('moodHistory') || '[]');
+
+      moodHistory = moodHistory.filter(record => record.date !== dateToSave);
+
       moodHistory.push(moodData);
       localStorage.setItem('moodHistory', JSON.stringify(moodHistory));
       alert('Mood recorded successfully');
       this.selectedMood = null;
-    }
-  }
+      this.selectedDateForMood = null;
+      this.loadMoodHistory();
+      console.log('Mood saved and loadMoodHistory called. Current moodHistory:', this.moodHistory);
+    },
+    loadMoodHistory() {
+      this.moodHistory = JSON.parse(localStorage.getItem('moodHistory') || '[]');
+      this.moodHistory.sort((a, b) => new Date(b.date) - new Date(a.date));
+      console.log('Mood history loaded:', this.moodHistory);
+    },
+    getMoodLabel(moodId) {
+      const mood = this.moods.find(m => m.id === moodId);
+      return mood ? mood.label : moodId;
+    },
+    setCurrentCalendarDate(date) {
+      this.currentCalendarDate = date;
+    },
+    getMoodsForDate(date) {
+      const dateString = date.toISOString().split('T')[0];
+      const records = this.moodHistory.filter(record => record.date === dateString);
+      console.log(`Getting moods for date: ${dateString}, found records: `, records);
+      return records.map(record => this.moods.find(mood => mood.id === record.mood)).filter(mood => mood !== undefined);
+    },
+    handleClickDate(date) {
+      // 使用本地时间而不是UTC时间
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const clickedDateString = `${year}-${month}-${day}`;
+
+      if (this.selectedDateForMood === clickedDateString) {
+        this.selectedDateForMood = null;
+      } else {
+        this.selectedDateForMood = clickedDateString;
+      }
+      console.log('Clicked date string:', this.selectedDateForMood);
+
+      this.$nextTick(() => {
+        const moodSection = this.$refs.moodSelection;
+        if (moodSection) {
+          moodSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    },
+    handleClickItem(item) {
+      console.log('Clicked item:', item);
+      const date = new Date(item.startDate);
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      this.selectedDateForMood = `${year}-${month}-${day}`;
+
+      if (item.moodId) {
+        this.selectedMood = item.moodId;
+      }
+
+      this.$nextTick(() => {
+        const moodSection = this.$refs.moodSelection;
+        if (moodSection) {
+          moodSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    },
+    isDateSelected(date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const dateString = `${year}-${month}-${day}`;
+      return this.selectedDateForMood === dateString;
+    },
+    clearSelectedDate() {
+      if (this.selectedDateForMood) {
+        // 从localStorage中删除选中日期的记录
+        let moodHistory = JSON.parse(localStorage.getItem('moodHistory') || '[]');
+        moodHistory = moodHistory.filter(record => record.date !== this.selectedDateForMood);
+        localStorage.setItem('moodHistory', JSON.stringify(moodHistory));
+        
+        // 重新加载心情历史
+        this.loadMoodHistory();
+      }
+      
+      this.selectedDateForMood = null;
+      this.selectedMood = null;
+      console.log('Selected date and mood cleared.');
+    },
+    moveCalendar(period) {
+      const newDate = new Date(this.currentCalendarDate);
+      switch (period) {
+        case 'prevYear':
+          newDate.setFullYear(newDate.getFullYear() - 1);
+          break;
+        case 'prevMonth':
+          newDate.setMonth(newDate.getMonth() - 1);
+          break;
+        case 'nextMonth':
+          newDate.setMonth(newDate.getMonth() + 1);
+          break;
+        case 'nextYear':
+          newDate.setFullYear(newDate.getFullYear() + 1);
+          break;
+      }
+      this.currentCalendarDate = newDate;
+    },
+  },
+  mounted() {
+    this.loadMoodHistory();
+  },
 }
 </script>
 
@@ -214,12 +388,13 @@ h2 {
   100% { transform: scale(1); }
 }
 .health-summary {
-  background-color: white;
+  background: linear-gradient(135deg, #fff 0%, #FFF5F7 100%);
   border-radius: 20px;
   padding: 20px;
   max-width: 1200px;
   margin: 0 auto 50px;
   box-shadow: 0 4px 20px rgba(156, 91, 128, 0.12);
+  border: 1px solid rgba(229, 124, 159, 0.1);
 }
 .summary-title {
   color: #4A2C40;
@@ -239,12 +414,14 @@ h2 {
   min-width: 120px;
   padding: 15px 10px;
   border-radius: 15px;
-  background-color: rgba(229, 124, 159, 0.05);
+  background: linear-gradient(135deg, rgba(229, 124, 159, 0.05) 0%, rgba(126, 184, 162, 0.05) 100%);
   transition: all 0.3s ease;
+  border: 1px solid rgba(229, 124, 159, 0.1);
 }
 .stat-item:hover {
-  background-color: rgba(229, 124, 159, 0.1);
+  background: linear-gradient(135deg, rgba(229, 124, 159, 0.1) 0%, rgba(126, 184, 162, 0.1) 100%);
   transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(229, 124, 159, 0.15);
 }
 .stat-value {
   font-size: clamp(24px, 3vw, 32px);
@@ -271,17 +448,35 @@ h2 {
   justify-content: center;
   align-items: center;
   padding: clamp(16px, 3vw, 24px);
-  background-color: white;
+  border: 1px solid rgba(229, 124, 159, 0.1);
   border-radius: 20px;
-  box-shadow: 0 4px 20px rgba(156, 91, 128, 0.12);
   text-decoration: none;
   color: #4A2C40;
   transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.female-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.6);
+  border-radius: 20px;
+  z-index: 1;
+}
+.female-card > * {
+  z-index: 2;
+  position: relative;
 }
 .female-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 8px 30px rgba(156, 91, 128, 0.15);
-  color: #E57C9F;
+  box-shadow: 0 8px 30px rgba(229, 124, 159, 0.15);
 }
 .card-icon {
   font-size: 48px;
@@ -387,7 +582,8 @@ h2 {
   background-color: #C45D7D;
 }
 .health-tips {
-  background-color: white;
+  background: linear-gradient(135deg, #fff 0%, #F5FAF7 100%);
+  border: 1px solid rgba(126, 184, 162, 0.1);
   border-radius: 20px;
   padding: 30px;
   max-width: 1200px;
@@ -401,11 +597,17 @@ h2 {
   text-align: center;
 }
 .tip-card {
-  background-color: rgba(229, 124, 159, 0.05);
+  background: linear-gradient(135deg, rgba(229, 124, 159, 0.05) 0%, rgba(126, 184, 162, 0.05) 100%);
+  border: 1px solid rgba(229, 124, 159, 0.1);
   border-radius: 15px;
   padding: 20px;
   margin-bottom: 20px;
-  border-left: 4px solid #E57C9F;
+  transition: all 0.3s ease;
+}
+.tip-card:hover {
+  background: linear-gradient(135deg, rgba(229, 124, 159, 0.1) 0%, rgba(126, 184, 162, 0.1) 100%);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(229, 124, 159, 0.15);
 }
 .tip-card h4 {
   color: #4A2C40;
@@ -417,5 +619,168 @@ h2 {
   color: #666;
   margin: 0;
   font-size: clamp(14px, 1.5vw, 16px);
+}
+
+/* Styles for Mood History Calendar Section */
+.mood-calendar-section {
+  margin-top: 40px;
+}
+
+.calendar-container {
+  position: relative;
+  height: 500px;
+}
+
+/* Custom styles for mood events in calendar */
+.cv-item.mood-event {
+  border-radius: 4px;
+  padding: 2px 5px;
+  font-size: 0.8rem;
+  color: white;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Example: Styling based on mood */
+.cv-item.mood-happy {
+  background-color: #a8e6cf;
+}
+
+.cv-item.mood-sad {
+  background-color: #ffaaa5;
+}
+
+.cv-item.mood-excited {
+  background-color: #ffd3b6;
+}
+
+.cv-item.mood-calm {
+  background-color: #a2b9bc;
+}
+
+.cv-item.mood-frustrated {
+  background-color: #ff8b94;
+}
+
+.cv-item.mood-tired {
+  background-color: #bae1ff;
+}
+
+.cv-item.mood-badmood {
+  background-color: #c23b22;
+}
+
+.cv-item.mood-relax {
+  background-color: #77dd77;
+}
+
+.cv-item.mood-fun {
+  background-color: #fdfd96;
+}
+
+/* Styles for day content to show mood icons */
+.cv-day .day-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  height: 100%;
+}
+
+.cv-day .day-number {
+  font-size: 1.2em;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.cv-day .mood-icons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  justify-content: center;
+}
+
+.cv-day .mood-icons i {
+  font-size: 0.9em;
+}
+
+.cv-day .mood-icons i.mood-happy { color: #a8e6cf; }
+.cv-day .mood-icons i.mood-sad { color: #ffaaa5; }
+.cv-day .mood-icons i.mood-excited { color: #ffd3b6; }
+.cv-day .mood-icons i.mood-calm { color: #a2b9bc; }
+.cv-day .mood-icons i.mood-frustrated { color: #ff8b94; }
+.cv-day .mood-icons i.mood-tired { color: #bae1ff; }
+.cv-day .mood-icons i.mood-badmood { color: #c23b22; }
+.cv-day .mood-icons i.mood-relax { color: #77dd77; }
+.cv-day .mood-icons i.mood-fun { color: #fdfd96; }
+
+/* Hide the default event rendering in the calendar cells */
+.cv-day .cv-item {
+  display: none;
+}
+
+/* Style for selected date */
+.cv-day .day-content.selected-date {
+  background-color: rgba(156, 91, 128, 0.2); /* Highlight with a light background color */
+  border: 2px solid #9C5B80; /* Add a border */
+  border-radius: 8px;
+}
+
+/* Style for clear button */
+.mood-submit .clear-button {
+  background-color: #a2b9bc; /* Grey color */
+  margin-left: 10px;
+}
+
+.mood-submit .clear-button:hover {
+  background-color: #8d9a9c; /* Darker grey on hover */
+}
+
+/* Custom calendar header styles */
+.calendar-header-custom {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 15px;
+  font-size: 1.2rem;
+  color: #4A2C40;
+}
+
+.calendar-header-custom button {
+  background: none;
+  border: 1px solid #ccc;
+  padding: 5px 10px;
+  margin: 0 5px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.calendar-header-custom button:hover {
+  background-color: #f0f0f0;
+}
+
+.calendar-header-custom span {
+  font-weight: bold;
+  margin: 0 10px;
+}
+
+/* Define background images for each card */
+.heart-rate-card {
+  background-image: url('@/assets/images/heart rate.jpg'); /* Replace with your image path */
+}
+
+.temperature-card {
+  background-image: url('@/assets/images/temperature.jpg'); /* Replace with your image path */
+}
+
+.menstrual-card {
+  background-image: url('@/assets/images/menstrual.jpg'); /* Replace with your image path */
+}
+
+.female-card:hover::before {
+  background-color: rgba(255, 255, 255, 0.4); /* Less opaque overlay on hover */
 }
 </style> 

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <button class="back-btn" @click="goBack">返回首页</button>
+    <button class="back-btn" @click="goBack">Back to Home</button>
     <div class="container">
       <div class="header">
         <h2 class="header-title"><i class="ri-calendar-event-line"></i>Menstrual Data</h2>
@@ -114,32 +114,99 @@ export default {
         chartInstance = new Chart(ctx, {
           type: 'bar',
           data: {
-            labels: labels.reverse(), // 最新的在右侧
+            labels: labels.reverse(),
             datasets: [
               {
                 label: 'Period Days',
                 data: periodDays.reverse(),
-                backgroundColor: '#E57C9F',
+                backgroundColor: [
+                  '#E57C9F',
+                  '#FFB6C1',
+                  '#FFC0CB',
+                  '#FFB6C1',
+                  '#E57C9F',
+                  '#FFB6C1',
+                  '#FFC0CB',
+                  '#FFB6C1',
+                  '#E57C9F',
+                  '#FFB6C1'
+                ],
                 borderColor: '#E57C9F',
-                borderWidth: 1
+                borderWidth: 1,
+                borderRadius: 8,
+                barPercentage: 0.6,
+                categoryPercentage: 0.8
               }
             ]
           },
           options: {
             responsive: true,
+            maintainAspectRatio: false,
             plugins: {
-              legend: { position: 'top', labels: { color: '#4A2C40' } }
+              legend: { 
+                position: 'top', 
+                labels: { 
+                  color: '#4A2C40',
+                  font: {
+                    size: 16,
+                    weight: 'bold'
+                  }
+                }
+              },
+              title: {
+                display: true,
+                text: 'Menstrual Cycle Duration',
+                color: '#4A2C40',
+                font: {
+                  size: 24,
+                  weight: 'bold'
+                },
+                padding: {
+                  top: 20,
+                  bottom: 30
+                }
+              }
             },
             scales: {
               y: {
                 beginAtZero: true,
-                grid: { color: 'rgba(74, 44, 64, 0.1)' },
-                ticks: { color: '#4A2C40' }
+                grid: { 
+                  color: 'rgba(74, 44, 64, 0.1)',
+                  drawBorder: false
+                },
+                ticks: { 
+                  color: '#4A2C40',
+                  font: {
+                    size: 14
+                  },
+                  padding: 10
+                },
+                title: {
+                  display: true,
+                  text: 'Days',
+                  color: '#4A2C40',
+                  font: {
+                    size: 16,
+                    weight: 'bold'
+                  }
+                }
               },
               x: {
-                grid: { color: 'rgba(74, 44, 64, 0.1)' },
-                ticks: { color: '#4A2C40' }
+                grid: { 
+                  display: false
+                },
+                ticks: { 
+                  color: '#4A2C40',
+                  font: {
+                    size: 14
+                  },
+                  padding: 10
+                }
               }
+            },
+            animation: {
+              duration: 2000,
+              easing: 'easeInOutQuart'
             }
           }
         })
@@ -182,8 +249,24 @@ export default {
 .stat-number { font-size: 28px; font-weight: bold; color: #E57C9F; margin-bottom: 5px; }
 .stat-title { font-size: 14px; color: #4A2C40; }
 
-.chart-container { background-color: white; border-radius: 20px; padding: 30px; margin: 20px auto; box-shadow: 0 4px 20px rgba(156, 91, 128, 0.12); text-align: center; /* 确保内容居中 */ }
-canvas { display: inline-block; /* 让 canvas 元素可以被 text-align 居中 */ max-width: 100%; height: auto; }
+.chart-container { 
+  background-color: white; 
+  border-radius: 20px; 
+  padding: 30px; 
+  margin: 20px auto; 
+  box-shadow: 0 4px 20px rgba(156, 91, 128, 0.12); 
+  text-align: center;
+  max-width: 1000px;  /* 增加最大宽度 */
+  width: 95%;        /* 增加响应式宽度 */
+  height: 500px;     /* 增加容器高度 */
+}
+
+canvas { 
+  display: inline-block;
+  max-width: 100%;
+  height: 100% !important;  /* 确保canvas占满容器高度 */
+  margin: 0 auto;
+}
 
 .tips-section { margin-top: 30px; background-color: white; border-radius: 20px; padding: 30px; box-shadow: 0 4px 20px rgba(156, 91, 128, 0.12); }
 .tips-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; margin-top: 20px; }
