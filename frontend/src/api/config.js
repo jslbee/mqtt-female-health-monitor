@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // 创建 axios 实例
 const api = axios.create({
-  baseURL: 'http://120.76.249.191:8000/api', // 修改为云服务器地址
+  baseURL: 'http://120.76.249.191/api', // 修改为云服务器地址
   timeout: 5000, // 请求超时时间
   headers: {
     'Content-Type': 'application/json'
