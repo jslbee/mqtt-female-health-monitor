@@ -34,7 +34,7 @@ export default {
         {
           name: 'Jieying Shen',
           role: 'Group Leader – Back-End Development & Server Connection',
-          studentId: '2202329013036N',
+          studentId: '202329013036N',
           email: 'shenj36@coventry.ac.uk',
           avatar: new URL('../assets/team/Jieying Shen.jpg', import.meta.url).href
         },
