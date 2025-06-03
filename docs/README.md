@@ -1,69 +1,93 @@
-# Artemis - 女性健康管理系统
 
-## 项目简介
-Artemis 是一个基于 Vue 3 开发的女性健康管理系统，提供健康指标监测、预测分析、消息中心等功能。系统采用前后端分离架构，使用现代化的技术栈构建。
+# Artemis – Female Health Monitoring System
 
-## 功能特点
-- 健康指标监测（心率、体温、经期）
-- 智能预测分析
-- 实时数据展示
-- 响应式设计，支持移动端和桌面端
-- 用户认证与授权
+**Artemis** is a lightweight, modular, and privacy-conscious health monitoring platform tailored for female users. It integrates real-time physiological data collection, menstrual cycle tracking and prediction, and intuitive data visualization into one unified system.
 
-## 技术栈
-- Vue 3
-- Vue Router
-- Axios
-- Chart.js
-- Vite
-- Remix Icon
+> 🖥️ **Live Demo**: [http://120.76.249.191/](http://120.76.249.191/)
 
-## 项目结构
-```
-artemis/
-├── src/
-│   ├── api/              # API 相关配置和服务
-│   │   ├── config.js     # Axios 配置
-│   │   └── services.js   # API 服务
-│   ├── views/            # 页面组件
-│   │   └── Prediction.vue
-│   ├── App.vue           # 根组件
-│   └── main.js           # 应用入口
-├── index.html            # HTML 入口
-├── package.json          # 项目配置
-├── vite.config.js        # Vite 配置
-└── README.md            # 项目说明
+---
+
+## 🌟 Features
+
+- 🔄 **MQTT-based data transmission** for real-time, lightweight sensor communication  
+- 📊 **Menstrual cycle prediction engine** based on personal data and time series logic  
+- 📈 **Visual health dashboard** built with Vue 3 and ECharts  
+- 🔐 **Privacy-first architecture**, ensuring data is processed and visualized securely  
+- 🧩 Modular and extensible system design  
+
+---
+
+## 🛠️ Tech Stack
+
+- **Frontend**: Vue 3, Vite, ECharts  
+- **Backend**: FastAPI (Python)  
+- **Database**: MySQL  
+- **Protocol**: MQTT  
+- **Deployment**: Nginx on Ubuntu VPS  
+
+---
+
+## 📂 Project Structure
+
 ```
 
-## 开发环境设置
-1. 安装依赖：
+Artemis/
+├── frontend/              # Vue3 + Vite frontend
+├── backend/               # FastAPI backend with RESTful APIs
+├── mqtt/                  # MQTT client and data simulation scripts
+├── database/              # MySQL schema and sample data
+└── docs/                  # Documentation and reports
+
+````
+
+---
+
+## 🚀 Quick Start
+
+### Prerequisites
+- Python 3.9+
+- Node.js and npm
+- MySQL 8+
+- MQTT broker (e.g. Mosquitto)
+
+### 1. Backend
+
 ```bash
+cd backend
+pip install -r requirements.txt
+uvicorn main:app --reload
+````
+
+### 2. Frontend
+
+```bash
+cd frontend
 npm install
-```
-
-2. 启动开发服务器：
-```bash
 npm run dev
 ```
 
-3. 构建生产版本：
+### 3. MQTT Data Simulation (Optional)
+
 ```bash
-npm run build
+cd mqtt
+python simulate_sensor.py
 ```
 
-4. 预览生产版本：
-```bash
-npm run preview
-```
+---
 
-## 环境要求
-- Node.js >= 18.0.0
-- npm >= 8.0.0
+## 💡 Purpose & Impact
 
-## 注意事项
-- 开发时请确保后端 API 服务已启动
-- 默认开发服务器端口为 3000
-- 生产环境部署前请确保已正确配置环境变量
+**Artemis** was born from the need to provide accessible and respectful health monitoring tools for women—especially students and individuals who lack access to traditional healthcare support.
 
-## 联系方式
-如有问题，请联系系统管理员。
+By combining open-source technologies with thoughtful UX design, Artemis empowers users to better understand and anticipate their physical and emotional states. Our goal is to reduce anxiety, improve awareness, and build tools that center care and equity.
+
+This project is submitted as part of a national innovation competition.
+
+---
+
+## 👨‍💻 Team
+
+We are a group of undergraduate students passionate about AI, healthcare technology, and human-centered design.
+Feedback and contributions are welcome!
+
+---
